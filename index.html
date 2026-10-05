@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto Creativo - Tapestry y Jacquard</title>
+    <style>
+        :root {
+            --color-terracota: #a34c30;
+            --color-tierra: #6b3e26;
+            --color-arena: #f4ebd0;
+            --color-cardon: #2d4a3e;
+            --color-fondo: #221a15;
+            --color-completado: #3a2e28;
+            --color-whatsapp: #25d366;
+            --color-corazon: #e74c3c;
+            --color-pro: #d4ac0d;
+            --color-admin: #3498db;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--color-fondo);
+            color: var(--color-arena);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--color-tierra), var(--color-terracota));
+            padding: 14px;
+            text-align: center;
+            border-bottom: 4px solid var(--color-cardon);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .logo-header {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--color-arena);
+            background-color: var(--color-fondo);
+        }
+
+        header h1 {
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            font-size: 0.75rem;
+            color: #d8c29d;
+            margin-top: 2px;
+        }
+
+        nav {
+            display: flex;
+            background-color: #18120e;
+            overflow-x: auto;
+            border-bottom: 2px solid var(--color-tierra);
+            white-space: nowrap;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--color-arena);
+            padding: 10px 14px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        nav button.active, nav button:hover {
+            background-color: var(--color-terracota);
+            color: white;
+            font-weight: bold;
+        }
+
+        main {
+            padding: 14px;
+            flex: 1;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            padding-bottom: 80px;
+        }
+
+        .section-view { display: none; }
+        .section-view.active-section { display: block; }
+
+        .card {
+            background-color: #2e241e;
+            border: 2px solid var(--color-tierra);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--color-arena);
+            border-bottom: 1px dashed var(--color-terracota);
+            padding-bottom: 6px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            color: #d8c29d;
+        }
+
+        input[type="file"], select, input[type="number"], input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            padding: 9px;
+            background-color: var(--color-fondo);
+            border: 1px solid var(--color-tierra);
+            color: var(--color-arena);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        textarea { resize: vertical; height: 80px; }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        button.btn-primary {
+            width: 100%;
+            background-color: var(--color-terracota);
+            color: white;
+            border: none;
+            padding: 11px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        .btn-secondary {
+            background-color: var(--color-cardon);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        .badge-pro {
+            background-color: var(--color-pro);
+            color: #221a15;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            vertical-align: middle;
+        }
+
+        .hidden { display: none !important; }
+
+        .preview-wrapper {
+            background: #111;
+            border: 2px solid var(--color-tierra);
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .zoom-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .zoom-btn {
+            background: var(--color-cardon);
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .preview-container {
+            width: 100%;
+            overflow: auto;
+            text-align: center;
+            max-height: 280px;
+        }
+
+        canvas {
+            image-rendering: pixelated;
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444;
+            transform-origin: top center;
+            transition: transform 0.1s ease;
+        }
+
+        .hilera-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #221a15;
+            border: 1px solid var(--color-tierra);
+            border-radius: 6px;
+            padding: 8px;
+        }
+
+        .hilera-item {
+            padding: 8px;
+            border-bottom: 1px solid #3a2e28;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .hilera-item.completada {
+            opacity: 0.4;
+            text-decoration: line-through;
+            background: var(--color-completado);
+        }
+
+        .color-muestra {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            margin: 0 4px;
+            vertical-align: middle;
+            border: 1px solid #fff;
+        }
+
+        .audio-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .audio-controls button {
+            flex: 1;
+            background-color: var(--color-cardon);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .biblio-menu-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .biblio-btn {
+            background-color: #221a15;
+            border: 1px solid var(--color-tierra);
+            color: var(--color-arena);
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .biblio-btn:hover, .biblio-btn.active {
+            background-color: var(--color-terracota);
+            border-color: var(--color-arena);
+        }
+
+        .biblio-categoria {
+            margin-bottom: 14px;
+            background: #221a15;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid var(--color-terracota);
+        }
+
+        .biblio-categoria h3 {
+            font-size: 1rem;
+            color: var(--color-arena);
+            margin-bottom: 8px;
+        }
+
+        .biblio-categoria p, .biblio-categoria li {
+            font-size: 0.82rem;
+            color: #d8c29d;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .post-card {
+            background: #221a15;
+            border: 1px solid var(--color-tierra);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .post-autor { font-weight: bold; font-size: 0.88rem; color: var(--color-arena); }
+        .post-fecha { font-size: 0.7rem; color: #a89270; }
+
+        .post-img {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid var(--color-tierra);
+            margin-bottom: 8px;
+        }
+
+        .post-descripcion { font-size: 0.82rem; color: #d8c29d; margin-bottom: 10px; line-height: 1.3; }
+        
+        .post-acciones {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid #3a2e28;
+            padding-top: 8px;
+        }
+
+        .btn-like {
+            background: none;
+            border: none;
+            color: var(--color-arena);
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-like span { color: var(--color-corazon); font-size: 1.1rem; }
+
+        .btn-eliminar-admin {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .modal-admin {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 15px;
+        }
+
+        .modal-admin-content {
+            background: #221a15;
+            border: 2px solid var(--color-admin);
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            background-color: var(--color-whatsapp);
+            color: white;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            z-index: 1000;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .whatsapp-float:hover { transform: scale(1.1); }
+
+        @media print {
+            body { background: white; color: black; }
+            header, nav, .btn-primary, .btn-secondary, .audio-controls, .whatsapp-float, .zoom-controls { display: none; }
+            .card { border: none; box-shadow: none; background: white; color: black; }
+        }
+    </style>
+</head>
+<body>
+
+    <header onclick="intentarAbrirAdmin()">
+        <img id="imgLogoHeader" src="" class="logo-header hidden" alt="Logotipo">
+        <div>
+            <h1>Punto Creativo</h1>
+            <p>Tapestry y Jacquard</p>
+        </div>
+    </header>
+
+    <nav>
+        <button class="active" onclick="cambiarTab('nuevo', this)">Nuevo</button>
+        <button onclick="cambiarTab('proyectos', this)">Proyectos</button>
+        <button onclick="cambiarTab('comunidad', this)">Comunidad</button>
+        <button onclick="cambiarTab('biblioteca', this)">Biblioteca</button>
+        <button onclick="cambiarTab('perfil', this)">Perfil</button>
+    </nav>
+
+    <main>
+        <!-- 1. NUEVO PROYECTO -->
+        <section id="seccion-nuevo" class="section-view active-section card">
+            <h2>Configurar Proyecto <span id="etiquetaPlanActual" style="font-size:0.75rem; background:#444; padding:2px 6px; border-radius:4px;">Versión Gratuita</span></h2>
+            
+            <div class="form-group">
+                <label for="nombreProj">Nombre del Proyecto:</label>
+                <input type="text" id="nombreProj" placeholder="Ej: Guardas Andinas">
+            </div>
+
+            <div class="form-group">
+                <label for="imagenInput">Subir imagen desde la galería:</label>
+                <input type="file" id="imagenInput" accept="image/*">
+            </div>
+
+            <div class="form-group">
+                <label for="tecnicaSelect">Técnica de tejido:</label>
+                <select id="tecnicaSelect">
+                    <option value="tapestry">Tapestry</option>
+                    <option value="jacquard">Jacquard</option>
+                </select>
+            </div>
+
+            <div class="grid-inputs">
+                <div class="form-group">
+                    <label for="anchoPuntos">Ancho (Máx <span id="limiteAnchoTxt">40</span>):</label>
+                    <input type="number" id="anchoPuntos" min="10" max="2000" value="20">
+                </div>
+                <div class="form-group">
+                    <label for="altoPuntos">Alto (Máx <span id="limiteAltoTxt">40</span>):</label>
+                    <input type="number" id="altoPuntos" min="10" max="2000" value="20">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cantColores">Cantidad de Colores (Máx <span id="limiteColorTxt">6</span>):</label>
+                <input type="number" id="cantColores" min="2" max="25" value="4">
+            </div>
+
+            <button class="btn-primary" id="btnGenerar">Generar y Pixelar Patrón</button>
+
+            <div id="area-resultado" class="hidden" style="margin-top: 15px;">
+                <hr style="border-color: var(--color-tierra); margin: 15px 0;">
+                <h2>Patrón Generado & Lectura</h2>
+                
+                <div class="preview-wrapper">
+                    <div class="zoom-controls">
+                        <button class="zoom-btn" onclick="ajustarZoom(0.2)">🔍 + Zoom</button>
+                        <button class="zoom-btn" onclick="ajustarZoom(-0.2)">🔍 - Zoom</button>
+                        <button class="zoom-btn" onclick="resetZoom()">1:1</button>
+                    </div>
+                    <div class="preview-container" id="contenedorCanvasScroll">
+                        <canvas id="canvasPatron"></canvas>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Paso a paso por hilera (Tocá para marcar completada):</label>
+                    <div class="hilera-list" id="listaHileras"></div>
+                </div>
+
+                <div class="audio-controls">
+                    <button id="btnVozPro" onclick="leerHileraVoz()">🔊 Leer Hilera <span class="badge-pro">PRO</span></button>
+                    <button onclick="reiniciarProgreso()" style="background-color: var(--color-terracota);">🔄 Reiniciar</button>
+                </div>
+                <button class="btn-primary" onclick="abrirTejerEnVivo()" style="background-color: var(--color-cardon); margin-top: 8px;">🧶 Iniciar Tejer en Vivo (Paso a Paso)</button>
+                <button class="btn-secondary" onclick="guardarProyecto()" style="background-color: var(--color-cardon); margin-top: 10px;">💾 Guardar Proyecto</button>
+                <button id="btnPdfPro" class="btn-secondary" onclick="imprimirPdfPro()" style="background-color: var(--color-tierra);">📄 Descargar / Imprimir PDF <span class="badge-pro">PRO</span></button>
+            </div>
+        </section>
+
+        <!-- 2. PROYECTOS GUARDADOS -->
+        <section id="seccion-proyectos" class="section-view card">
+            <h2>Mis Proyectos Guardados</h2>
+            <div id="listaProyectosGuardados">
+                <p style="font-size: 0.85rem; color: #d8c29d;">No hay proyectos guardados todavía.</p>
+            </div>
+        </section>
+
+        <!-- 3. COMUNIDAD -->
+        <section id="seccion-comunidad" class="section-view card">
+            <h2>Muro de la Comunidad 🧶</h2>
+            <p style="font-size: 0.8rem; color: #d8c29d; margin-bottom: 12px;">Compartí las fotos de tus prendas terminadas con otros tejedores.</p>
+
+            <div style="background: #221a15; padding: 12px; border-radius: 6px; margin-bottom: 16px; border: 1px dashed var(--color-terracota);">
+                <h3 style="font-size: 0.9rem; color: var(--color-arena); margin-bottom: 8px;">✨ Publicar mi trabajo</h3>
+                <div class="form-group">
+                    <label for="autorPost">Tu Nombre / Marca:</label>
+                    <input type="text" id="autorPost" placeholder="Ej: Tejeduría Andina">
+                </div>
+                <div class="form-group">
+                    <label for="fotoPostInput">Foto de la prenda terminada:</label>
+                    <input type="file" id="fotoPostInput" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="descPost">Comentario o detalle de la técnica:</label>
+                    <textarea id="descPost" placeholder="Contá con qué hilos lo tejiste..."></textarea>
+                </div>
+                <button class="btn-primary" onclick="publicarEnComunidad()">Subir a la Comunidad</button>
+            </div>
+
+            <div id="muroComunidadContenedor"></div>
+        </section>
+
+        <!-- 4. BIBLIOTECA -->
+        <section id="seccion-biblioteca" class="section-view card">
+            <h2>Biblioteca de Técnicas y Módulos</h2>
+            <p style="font-size: 0.8rem; color: #d8c29d; margin-bottom: 12px;">Seleccioná una categoría para ver los puntos disponibles.</p>
+
+            <div class="biblio-menu-btns">
+                <button class="biblio-btn active" onclick="filtrarBiblioteca('crochet', this)">🧶 Crochet</button>
+                <button class="biblio-btn" onclick="filtrarBiblioteca('tricot', this)">🪡 Tricot / Dos Agujas</button>
+                <button class="biblio-btn" onclick="filtrarBiblioteca('telar', this)">🧵 Telar</button>
+                <button class="biblio-btn" onclick="filtrarBiblioteca('macrame', this)">🪢 Macramé</button>
+            </div>
+
+            <div id="contenedorBibliotecaDinamica"></div>
+        </section>
+
+        <!-- 5. PERFIL Y SUSCRIPCIÓN -->
+        <section id="seccion-perfil" class="section-view card">
+            <h2>Perfil y Suscripción</h2>
+            <div style="text-align: center; padding: 10px 0 15px 0;">
+                <div style="font-size: 2.5rem; margin-bottom: 6px;">🧵</div>
+                <h3 style="font-size: 1.1rem; color: var(--color-arena);">Punto Creativo</h3>
+                <p id="estadoSuscripcionPerfil" style="font-size: 0.85rem; color: #d4ac0d; font-weight: bold; margin-top: 6px;">Estado actual: Versión Gratuita</p>
+                
+                <div style="margin-top: 14px; padding: 12px; background: #221a15; border-radius: 6px; border: 1px solid var(--color-pro);">
+                    <p style="font-size: 0.82rem; color: var(--color-arena); margin-bottom: 6px;"><strong>¿Querés pasar a la Versión Pro? ($12.500/mes)</strong></p>
+                    <p style="font-size: 0.75rem; color: #d8c29d; margin-bottom: 8px;">Transferí a <strong>punto.creativo.com</strong> (Alias) e indicanos el comprobante por WhatsApp. Te daremos un código de un solo uso.</p>
+                    <div class="form-group">
+                        <input type="text" id="inputCodigoPro" placeholder="Ingresá tu código (ej: creativo-juan-1990)">
+                    </div>
+                    <button class="btn-primary" style="background-color: var(--color-pro); color:#221a15;" onclick="activarCodigoPro()">Activar Versión Pro</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modalPanelAdmin" class="modal-admin hidden">
+        <div class="modal-admin-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--color-admin); padding-bottom: 6px;">
+                <h3 style="font-size: 1rem; color: var(--color-admin);">🔐 Panel de Propietario (Iván)</h3>
+                <button onclick="cerrarModalAdmin()" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer;">✕</button>
+            </div>
+
+            <div id="areaLoginAdmin">
+                <p style="font-size: 0.8rem; color: #d8c29d; margin-bottom: 10px;">Ingresá tus credenciales de acceso:</p>
+                <div class="form-group">
+                    <input type="text" id="usuarioAdmin" placeholder="Usuario">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="claveAdmin" placeholder="Contraseña">
+                </div>
+                <button class="btn-primary" style="background-color: var(--color-admin);" onclick="verificarAdmin()">Acceder al Modo Administrador</button>
+            </div>
+
+            <div id="areaPanelAdmin" class="hidden">
+                <p style="font-size: 0.82rem; color: #2ecc71; margin-bottom: 12px; font-weight: bold;">✔ Sesión de Iván Activa</p>
+                
+                <div class="form-group">
+                    <label for="inputLogotipo">Cambiar Logotipo de la App:</label>
+                    <input type="file" id="inputLogotipo" accept="image/*">
+                </div>
+                <button class="btn-primary" style="background-color: var(--color-admin); margin-bottom: 14px;" onclick="guardarLogotipoApp()">Actualizar Logotipo</button>
+
+                <div style="background: #18120e; padding: 10px; border-radius: 6px; margin-bottom: 14px; border: 1px solid var(--color-tierra);">
+                    <label style="color: var(--color-arena); font-weight: bold; margin-bottom: 6px;">📌 Agregar Técnica a la Biblioteca Pro:</label>
+                    <div class="form-group" style="margin-top: 6px;">
+                        <select id="nuevaCategoria">
+                            <option value="crochet">Crochet</option>
+                            <option value="tricot">Tricot / Dos Agujas</option>
+                            <option value="telar">Telar</option>
+                            <option value="macrame">Macramé</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="nuevoTitulo" placeholder="Título (Ej: Punto Garbancito)">
+                    </div>
+                    <div class="form-group">
+                        <textarea id="nuevoDetalle" placeholder="Descripción detallada..."></textarea>
+                    </div>
+                    <button class="btn-secondary" style="background-color: var(--color-admin);" onclick="agregarNotaBiblioteca()">Guardar en Biblioteca Pro</button>
+                </div>
+
+                <div style="background: #18120e; padding: 10px; border-radius: 6px; margin-bottom: 14px; border: 1px solid var(--color-pro);">
+                    <label style="color: var(--color-pro); font-weight: bold; margin-bottom: 6px;">🎫 Generador de Códigos Pro:</label>
+                    <div class="form-group" style="margin-top: 6px;">
+                        <input type="text" id="adminNombreUser" placeholder="Nombre usuario (ej: maria)">
+                    </div>
+                    <div class="form-group">
+                        <input type="number" id="adminAnioUser" placeholder="Año nacimiento (ej: 1985)">
+                    </div>
+                    <div class="form-group">
+                        <label for="adminMesesUser" style="color: #d8c29d; font-size: 0.75rem;">Meses pagados:</label>
+                        <input type="number" id="adminMesesUser" min="1" max="12" value="1">
+                    </div>
+                    <button class="btn-secondary" style="background-color: var(--color-pro); color:#221a15; font-weight:bold;" onclick="generarNuevoCodigoPro()">Crear Código Pro</button>
+                    
+                    <p style="font-size: 0.75rem; color: #d8c29d; margin-top: 8px;">Códigos generados:</p>
+                    <div id="listaCodigosAdminContenedor" style="max-height: 140px; overflow-y: auto; background: #221a15; padding: 6px; border-radius: 4px; margin-top: 4px;"></div>
+                </div>
+
+                <button class="btn-secondary" onclick="cerrarAdmin()" style="background-color: #c0392b;">Cerrar Sesión Administrador</button>
+            </div>
+        </div>
+    </div>
+
+    <a href="https://wa.me/5493884098349?text=Hola%20Iván,%20te%20envío%20el%20comprobante%20de%20pago%20para%20la%20versión%20Pro%20de%20Punto%20Creativo." class="whatsapp-float" target="_blank" title="Contactar por WhatsApp">
+        💬
+    </a>
+
+    <script>
+        let totalHilerasDatos = [];
+        let categoriaActualBiblio = 'crochet';
+        let zoomActual = 1;
+        let contadorClicksHeader = 0;
+        let hileraActualIndex = 0;
+
+        function cambiarTab(idSeccion, btn) {
+            document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active-section'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            
+            const seccionDestino = document.getElementById(`seccion-${idSeccion}`);
+            if (seccionDestino) {
+                seccionDestino.classList.add('active-section');
+            }
+            btn.classList.add('active');
+
+            if(idSeccion === 'proyectos') cargarProyectosGuardados();
+            if(idSeccion === 'comunidad') cargarComunidadPosts();
+            if(idSeccion === 'biblioteca') renderizarBiblioteca();
+        }
+
+        window.onload = function() {
+            verificarEstadoPro();
+            renderizarBiblioteca();
+            cargarComunidadPosts();
+            cargarLogotipoGuardado();
+        };
+
+        function esUsuarioPro() {
+            let proData = localStorage.getItem('punto_creativo_pro');
+            if (!proData) return false;
+            let datos = JSON.parse(proData);
+            if (new Date().getTime() > datos.expira) {
+                localStorage.removeItem('punto_creativo_pro');
+                return false;
+            }
+            return true;
+        }
+
+        function esAdminApp() {
+            return localStorage.getItem('punto_creativo_es_admin') === 'true';
+        }
+
+        function verificarEstadoPro() {
+            const esPro = esUsuarioPro() || esAdminApp();
+            const etiquetaPlan = document.getElementById('etiquetaPlanActual');
+            const estadoPerfil = document.getElementById('estadoSuscripcionPerfil');
+
+            if (esAdminApp() || esPro) {
+                etiquetaPlan.textContent = esAdminApp() ? 'Administrador (Iván)' : 'Versión PRO';
+                etiquetaPlan.style.background = esAdminApp() ? 'var(--color-admin)' : 'var(--color-pro)';
+                etiquetaPlan.style.color = esAdminApp() ? 'white' : '#221a15';
+                estadoPerfil.textContent = esAdminApp() ? 'Estado actual: Modo Administrador Activo' : 'Estado actual: ¡Versión Pro Activa!';
+                document.getElementById('limiteAnchoTxt').textContent = '2000';
+                document.getElementById('limiteAltoTxt').textContent = '2000';
+                document.getElementById('limiteColorTxt').textContent = '25';
+            } else {
+                etiquetaPlan.textContent = 'Versión Gratuita';
+                etiquetaPlan.style.background = '#444';
+                etiquetaPlan.style.color = 'var(--color-arena)';
+                estadoPerfil.textContent = 'Estado actual: Versión Gratuita';
+                document.getElementById('limiteAnchoTxt').textContent = '40';
+                document.getElementById('limiteAltoTxt').textContent = '40';
+                document.getElementById('limiteColorTxt').textContent = '6';
+            }
+        }
+
+        function activarCodigoPro() {
+            let codigoIngresado = document.getElementById('inputCodigoPro').value.trim().toLowerCase();
+            let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
+            let index = listaCodigos.findIndex(c => c.codigo === codigoIngresado && !c.utilizado);
+
+            if (index !== -1) {
+                let item = listaCodigos[index];
+                let duracionMs = item.meses * 30 * 24 * 60 * 60 * 1000;
+                let expiraTiempo = new Date().getTime() + duracionMs;
+                
+                localStorage.setItem('punto_creativo_pro', JSON.stringify({ expira: expiraTiempo }));
+                item.utilizado = true;
+                item.fechaUso = new Date().toLocaleDateString();
+                localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
+
+                document.getElementById('inputCodigoPro').value = '';
+                verificarEstadoPro();
+                alert(`¡Felicitaciones! Versión Pro activada por ${item.meses} mes(es) con éxito.`);
+            } else {
+                alert('Código inválido o ya utilizado.');
+            }
+        }
+
+        function intentarAbrirAdmin() {
+            contadorClicksHeader++;
+            if (contadorClicksHeader >= 4 || esAdminApp()) {
+                contadorClicksHeader = 0;
+                document.getElementById('modalPanelAdmin').classList.remove('hidden');
+                if (esAdminApp()) {
+                    document.getElementById('areaLoginAdmin').classList.add('hidden');
+                    document.getElementById('areaPanelAdmin').classList.remove('hidden');
+                    renderizarListaCodigosAdmin();
+                } else {
+                    document.getElementById('areaLoginAdmin').classList.remove('hidden');
+                    document.getElementById('areaPanelAdmin').classList.add('hidden');
+                }
+            }
+            setTimeout(() => { contadorClicksHeader = 0; }, 2000);
+        }
+
+        function cerrarModalAdmin() {
+            document.getElementById('modalPanelAdmin').classList.add('hidden');
+        }
+
+        function verificarAdmin() {
+            const usuarioInput = document.getElementById('usuarioAdmin').value.trim();
+            const claveInput = document.getElementById('claveAdmin').value.trim();
+            if (usuarioInput.toLowerCase() === 'puntocreativoivam' && claveInput.toLowerCase() === '7chanchitos') {
+                localStorage.setItem('punto_creativo_es_admin', 'true');
+                document.getElementById('areaLoginAdmin').classList.add('hidden');
+                document.getElementById('areaPanelAdmin').classList.remove('hidden');
+                verificarEstadoPro();
+                renderizarListaCodigosAdmin();
+                alert('¡Modo administrador activado con éxito!');
+            } else {
+                alert('Credenciales incorrectas.');
+            }
+        }
+
+        function cerrarAdmin() {
+            localStorage.removeItem('punto_creativo_es_admin');
+            verificarEstadoPro();
+            cerrarModalAdmin();
+            alert('Sesión de administrador cerrada.');
+        }
+
+        function generarNuevoCodigoPro() {
+            let nombre = document.getElementById('adminNombreUser').value.trim().toLowerCase().replace(/\s+/g, '');
+            let anio = document.getElementById('adminAnioUser').value.trim();
+            let meses = parseInt(document.getElementById('adminMesesUser').value) || 1;
+
+            if (!nombre || !anio) { alert('Completá nombre y año.'); return; }
+            let codigoGenerado = `creativo-${nombre}-${anio}`;
+            let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
+            
+            listaCodigos.push({ codigo: codigoGenerado, meses: meses, creado: new Date().toLocaleDateString(), utilizado: false });
+            localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
+
+            document.getElementById('adminNombreUser').value = '';
+            document.getElementById('adminAnioUser').value = '';
+            renderizarListaCodigosAdmin();
+            alert(`Código creado:\n${codigoGenerado}`);
+        }
+
+        function renderizarListaCodigosAdmin() {
+            let contenedor = document.getElementById('listaCodigosAdminContenedor');
+            let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
+            if (listaCodigos.length === 0) { contenedor.innerHTML = '<p style="font-size: 0.75rem; color: #a89270;">Sin códigos.</p>'; return; }
+            let html = '';
+            listaCodigos.forEach(item => {
+                let estadoTxt = item.utilizado ? `<span style="color: #2ecc71;">(Usado)</span>` : `<span style="color: var(--color-pro);">(Pendiente)</span>`;
+                html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #332720; font-size: 0.75rem;">
+                    <div><strong style="color: var(--color-arena);">${item.codigo}</strong> ${estadoTxt} (${item.meses}m)</div>
+                    <button onclick="eliminarCodigoAdmin('${item.codigo}')" style="background: none; border: none; color: #e74c3c; cursor: pointer;">❌</button>
+                </div>`;
+            });
+            contenedor.innerHTML = html;
+        }
+
+        function eliminarCodigoAdmin(codigo) {
+            let lista = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
+            lista = lista.filter(c => c.codigo !== codigo);
+            localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(lista));
+            renderizarListaCodigosAdmin();
+        }
+
+        function guardarLogotipoApp() {
+            const inputLogo = document.getElementById('inputLogotipo');
+            if (!inputLogo.files || !inputLogo.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                localStorage.setItem('punto_creativo_logo', e.target.result);
+                aplicarLogotipoEnUI(e.target.result);
+                alert('¡Logotipo actualizado!');
+            }
+            reader.readAsDataURL(inputLogo.files[0]);
+        }
+
+        function cargarLogotipoGuardado() {
+            const logoData = localStorage.getItem('punto_creativo_logo');
+            if (logoData) aplicarLogotipoEnUI(logoData);
+        }
+
+        function aplicarLogotipoEnUI(dataURL) {
+            const imgHeader = document.getElementById('imgLogoHeader');
+            imgHeader.src = dataURL;
+            imgHeader.classList.remove('hidden');
+        }
+
+        function ajustarZoom(cuanto) {
+            zoomActual = Math.max(0.5, Math.min(4, zoomActual + cuanto));
+            document.getElementById('canvasPatron').style.transform = `scale(${zoomActual})`;
+        }
+
+        function resetZoom() {
+            zoomActual = 1;
+            document.getElementById('canvasPatron').style.transform = `scale(1)`;
+        }
+
+        function filtrarBiblioteca(cat, btn) {
+            document.querySelectorAll('.biblio-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            categoriaActualBiblio = cat;
+            renderizarBiblioteca();
+        }
+
+        function renderizarBiblioteca() {
+            const contenedor = document.getElementById('contenedorBibliotecaDinamica');
+            const esPro = esUsuarioPro() || esAdminApp();
+            
+            let baseNotas = {
+                crochet: [{ titulo: "Punto Cadena y Medio Punto", detalle: "Bases fundamentales para iniciar diagramas en crochet y tapestry." }],
+                tricot: [{ titulo: "Punto Derecho y Revés", detalle: "La estructura base para tricot y jacquard en dos agujas." }],
+                telar: [{ titulo: "Trama y Urdimbre", detalle: "Conceptos iniciales para tejido artesanal en telar vertical y horizontal." }],
+                macrame: [{ titulo: "Nudo Llano", detalle: "Nudo clásico para la creación de tramas decorativas y soportes." }]
+            };
+
+            let notasCustom = JSON.parse(localStorage.getItem('punto_creativo_notas') || '[]');
+            let notasFiltradasCustom = notasCustom.filter(n => n.categoria === categoriaActualBiblio);
+            let notasBaseFiltradas = baseNotas[categoriaActualBiblio] || [];
+
+            let html = '';
+            notasBaseFiltradas.forEach(n => {
+                html += `<div class="biblio-categoria"><h3>🧶 ${n.titulo}</h3><p>${n.detalle}</p></div>`;
+            });
+
+            if (notasFiltradasCustom.length > 0) {
+                html += `<h3 style="font-size:0.9rem; color:var(--color-pro); margin: 12px 0 6px 0;">⭐ Apuntes Especiales Pro</h3>`;
+                notasFiltradasCustom.forEach(n => {
+                    if (esPro) {
+                        html += `<div class="biblio-categoria" style="border-left-color: var(--color-pro);"><h3>📌 ${n.titulo} <span class="badge-pro">PRO</span></h3><p>${n.detalle.replace(/\n/g, '<br>')}</p></div>`;
+                    } else {
+                        html += `<div class="biblio-categoria" style="opacity: 0.6;"><h3>🔒 ${n.titulo} <span class="badge-pro">PRO</span></h3><p>Apunte avanzado exclusivo de la Versión Pro.</p></div>`;
+                    }
+                });
+            }
+            contenedor.innerHTML = html;
+        }
+
+        function agregarNotaBiblioteca() {
+            const cat = document.getElementById('nuevaCategoria').value;
+            const titulo = document.getElementById('nuevoTitulo').value;
+            const detalle = document.getElementById('nuevoDetalle').value;
+            if(!titulo || !detalle) { alert('Completá los campos.'); return; }
+            let notas = JSON.parse(localStorage.getItem('punto_creativo_notas') || '[]');
+            notas.push({ categoria: cat, titulo: titulo, detalle: detalle });
+            localStorage.setItem('punto_creativo_notas', JSON.stringify(notas));
+            document.getElementById('nuevoTitulo').value = '';
+            document.getElementById('nuevoDetalle').value = '';
+            alert('¡Técnica guardada!');
+            renderizarBiblioteca();
+        }
+
+        function publicarEnComunidad() {
+            const autor = document.getElementById('autorPost').value || "Tejedora";
+            const desc = document.getElementById('descPost').value;
+            const inputFoto = document.getElementById('fotoPostInput');
+            if (!inputFoto.files || !inputFoto.files[0]) { alert('Agregá una foto.'); return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let posts = JSON.parse(localStorage.getItem('punto_creativo_comunidad') || '[]');
+                posts.unshift({ id: Date.now(), autor: autor, fecha: new Date().toLocaleDateString(), imagen: e.target.result, descripcion: desc, likes: 0 });
+                localStorage.setItem('punto_creativo_comunidad', JSON.stringify(posts));
+                document.getElementById('autorPost').value = ''; document.getElementById('descPost').value = ''; inputFoto.value = '';
+                alert('¡Publicado!');
+                cargarComunidadPosts();
+            }
+            reader.readAsDataURL(inputFoto.files[0]);
+        }
+
+        function cargarComunidadPosts() {
+            const contenedor = document.getElementById('muroComunidadContenedor');
+            let posts = JSON.parse(localStorage.getItem('punto_creativo_comunidad') || '[]');
+            const esAdmin = esAdminApp();
+            if (posts.length === 0) { contenedor.innerHTML = '<p style="font-size: 0.85rem; color: #d8c29d;">No hay publicaciones.</p>'; return; }
+            contenedor.innerHTML = '';
+            posts.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'post-card';
+                let imgHtml = p.imagen ? `<img src="${p.imagen}" class="post-img">` : '';
+                let botonBorrarAdmin = esAdmin ? `<button class="btn-eliminar-admin" onclick="eliminarPostAdmin(${p.id})">🗑️ [Admin] Borrar</button>` : '';
+                div.innerHTML = `<div class="post-header"><span class="post-autor">👤 ${p.autor}</span><span class="post-fecha">${p.fecha}</span></div>${imgHtml}<p class="post-descripcion">${p.descripcion}</p><div class="post-acciones"><button class="btn-like" onclick="darLike(${p.id})"><span>❤️</span> ${p.likes} Me gusta</button>${botonBorrarAdmin}</div>`;
+                contenedor.appendChild(div);
+            });
+        }
+
+        function darLike(id) {
+            let posts = JSON.parse(localStorage.getItem('punto_creativo_comunidad') || '[]');
+            let post = posts.find(p => p.id === id);
+            if(post) { post.likes++; localStorage.setItem('punto_creativo_comunidad', JSON.stringify(posts)); cargarComunidadPosts(); }
+        }
+
+        function eliminarPostAdmin(id) {
+            if(confirm('¿Borrar publicación?')) {
+                let posts = JSON.parse(localStorage.getItem('punto_creativo_comunidad') || '[]');
+                posts = posts.filter(p => p.id !== id);
+                localStorage.setItem('punto_creativo_comunidad', JSON.stringify(posts));
+                cargarComunidadPosts();
+            }
+        }
+
+        document.getElementById('btnGenerar').addEventListener('click', function() {
+            const ancho = parseInt(document.getElementById('anchoPuntos').value) || 20;
+            const alto = parseInt(document.getElementById('altoPuntos').value) || 20;
+            const colores = parseInt(document.getElementById('cantColores').value) || 4;
+            const esPro = esUsuarioPro() || esAdminApp();
+
+            if (!esPro && (ancho > 40 || alto > 40 || colores > 6)) {
+                alert('⚠️ La Versión Gratuita permite un máximo de 40x40 puntos y 6 colores. Activá la Versión Pro para medidas superiores.');
+                return;
+            }
+
+            resetZoom();
+            const inputImg = document.getElementById('imagenInput');
+            if (inputImg.files && inputImg.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() { procesarImagen(img, ancho, alto); }
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(inputImg.files[0]);
+            } else {
+                generarPatronPrueba(ancho, alto);
+            }
+        });
+
+        function procesarImagen(img, ancho, alto) {
+            const canvas = document.getElementById('canvasPatron');
+            const ctx = canvas.getContext('2d');
+            canvas.width = ancho; canvas.height = alto;
+            ctx.drawImage(img, 0, 0, ancho, alto);
+            document.getElementById('area-resultado').classList.remove('hidden');
+            construirHileras(ancho, alto);
+        }
+
+        function generarPatronPrueba(ancho, alto) {
+            const canvas = document.getElementById('canvasPatron');
+            const ctx = canvas.getContext('2d');
+            canvas.width = ancho; canvas.height = alto;
+            ctx.fillStyle = '#f4ebd0'; ctx.fillRect(0, 0, ancho, alto);
+            ctx.fillStyle = '#a34c30'; ctx.fillRect(Math.floor(ancho/2)-2, Math.floor(alto/2)-2, 4, 4);
+            document.getElementById('area-resultado').classList.remove('hidden');
+            construirHileras(ancho, alto);
+        }
+
+        function construirHileras(ancho, alto) {
+            const listaHileras = document.getElementById('listaHileras');
+            listaHileras.innerHTML = '';
+            totalHilerasDatos = [];
+            const canvas = document.getElementById('canvasPatron');
+            const ctx = canvas.getContext('2d');
+
+            for (let y = alto - 1; y >= 0; y--) {
+                let numeroHileraReal = (alto - y);
+                let bloques = []; 
+                let colorAnteriorHex = null; 
+                let colorAnteriorRgb = null; 
+                let contador = 0;
+
+                for (let x = 0; x < ancho; x++) {
+                    let pixel = ctx.getImageData(x, y, 1, 1).data;
+                    let colorHex = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+
+                    let esIgual = colorAnteriorRgb && 
+                        Math.abs(pixel[0] - colorAnteriorRgb[0]) < 25 &&
+                        Math.abs(pixel[1] - colorAnteriorRgb[1]) < 25 &&
+                        Math.abs(pixel[2] - colorAnteriorRgb[2]) < 25;
+
+                    if (esIgual) { 
+                        contador++; 
+                    } else {
+                        if (contador > 0 && colorAnteriorHex !== null) {
+                            bloques.push({ color: colorAnteriorHex, cantidad: contador });
+                        }
+                        colorAnteriorHex = colorHex;
+                        colorAnteriorRgb = [pixel[0], pixel[1], pixel[2]];
+                        contador = 1;
+                    }
+                }
+                if (contador > 0 && colorAnteriorHex !== null) {
+                    bloques.push({ color: colorAnteriorHex, cantidad: contador });
+                }
+
+                totalHilerasDatos.push({ fila: numeroHileraReal, bloques: bloques });
+
+                const div = document.createElement('div');
+                div.className = 'hilera-item';
+                div.id = `hilera-${numeroHileraReal}`;
+                
+                let textoBloques = `Hilera ${numeroHileraReal}: `;
+                bloques.forEach(b => { 
+                    textoBloques += `${b.cantidad} <span class="color-muestra" style="background-color: ${b.color};"></span>; `; 
+                });
+                
+                div.innerHTML = textoBloques;
+                div.onclick = function() { div.classList.toggle('completada'); };
+                listaHileras.appendChild(div);
+            }
+        }
+
+        function leerHileraVoz() {
+            const esPro = esUsuarioPro() || esAdminApp();
+            if (!esPro) { alert('🔒 Lectura de voz exclusiva de la Versión Pro.'); return; }
+            if ('speechSynthesis' in window && totalHilerasDatos.length > 0) {
+                window.speechSynthesis.cancel();
+                let hileraPendiente = totalHilerasDatos.find(h => !document.getElementById(`hilera-${h.fila}`).classList.contains('completada'));
+                if (hileraPendiente) {
+                    let textoDictado = `Hilera ${hileraPendiente.fila}. `;
+                    hileraPendiente.bloques.forEach(b => { textoDictado += `${b.cantidad} puntos. `; });
+                    const utterance = new SpeechSynthesisUtterance(textoDictado);
+                    utterance.lang = 'es-AR';
+                    window.speechSynthesis.speak(utterance);
+                } else { alert('¡Completaste todas las hileras!'); }
+            }
+        }
+
+        function imprimirPdfPro() {
+            if (!esUsuarioPro() && !esAdminApp()) { alert('🔒 Exclusivo Versión Pro.'); return; }
+            window.print();
+        }
+
+        function reiniciarProgreso() {
+            document.querySelectorAll('.hilera-item').forEach(item => item.classList.remove('completada'));
+        }
+
+        function guardarProyecto() {
+            const nombre = document.getElementById('nombreProj').value || "Proyecto";
+            const canvas = document.getElementById('canvasPatron');
+            let proyectos = JSON.parse(localStorage.getItem('punto_creativo_proyectos') || '[]');
+            proyectos.push({ nombre: nombre, fecha: new Date().toLocaleDateString(), imagen: canvas.toDataURL() });
+            localStorage.setItem('punto_creativo_proyectos', JSON.stringify(proyectos));
+            alert('¡Proyecto guardado!');
+        }
+
+        function abrirTejerEnVivo() {
+            if (!totalHilerasDatos || totalHilerasDatos.length === 0) {
+                alert('Primero generá un patrón para poder usar el tejido en vivo.');
+                return;
+            }
+            hileraActualIndex = 0;
+            crearModalTejerEnVivo();
+            actualizarVistaTejerEnVivo();
+        }
+
+        function crearModalTejerEnVivo() {
+            let modalExistente = document.getElementById('modalTejerEnVivo');
+            if (modalExistente) {
+                modalExistente.remove();
+            }
+
+            const modal = document.createElement('div');
+            modal.id = 'modalTejerEnVivo';
+            modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 20px;";
+            
+            modal.innerHTML = `
+                <div style="background: #2e241e; border: 2px solid var(--color-terracota); border-radius: 12px; padding: 20px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.6);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--color-tierra); padding-bottom: 8px;">
+                        <h3 style="font-size: 1.1rem; color: var(--color-arena);">🧶 Tejiendo en Vivo Paso a Paso</h3>
+                        <button onclick="document.getElementById('modalTejerEnVivo').remove()" style="background: none; border: none; color: white; font-size: 1.3rem; cursor: pointer;">✕</button>
+                    </div>
+                    
+                    <div id="vivoContenedorHilera" style="background: #221a15; padding: 20px; border-radius: 8px; border: 1px solid var(--color-tierra); margin-bottom: 20px; min-height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn-secondary" onclick="cambiarHileraVivo(-1)" style="background-color: var(--color-tierra);">⬅ Hilera Anterior</button>
+                        <button class="btn-primary" onclick="cambiarHileraVivo(1)" style="background-color: var(--color-terracota); margin-top:0;">Hilera Siguiente ➡</button>
+                    </div>
+
+                    <button onclick="marcarYAvanzarVivo()" class="btn-secondary" style="background-color: var(--color-cardon); width: 100%;">✔ Marcar completada y pasar a la siguiente</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function actualizarVistaTejerEnVivo() {
+            const contenedorVivo = document.getElementById('vivoContenedorHilera');
+            if (!contenedorVivo) return;
+
+            let hileraData = totalHilerasDatos[hileraActualIndex];
+            let htmlBloques = `<span style="font-size: 1.1rem; font-weight: bold; color: var(--color-pro); margin-bottom: 10px;">Hilera ${hileraData.fila} de ${totalHilerasDatos.length}</span><div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; align-items: center; margin-top: 8px;">`;
+            
+            hileraData.bloques.forEach(b => {
+                htmlBloques += `<span style="font-size: 1rem; background: #3a2e28; padding: 4px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                    ${b.cantidad} <span class="color-muestra" style="width: 18px; height: 18px; background-color: ${b.color};"></span>
+                </span>`;
+            });
+            htmlBloques += `</div>`;
+            contenedorVivo.innerHTML = htmlBloques;
+        }
+
+        function cambiarHileraVivo(direccion) {
+            hileraActualIndex += direccion;
+            if (hileraActualIndex < 0) hileraActualIndex = 0;
+            if (hileraActualIndex >= totalHilerasDatos.length) hileraActualIndex = totalHilerasDatos.length - 1;
+            actualizarVistaTejerEnVivo();
+        }
+
+        function marcarYAvanzarVivo() {
+            let hileraData = totalHilerasDatos[hileraActualIndex];
+            let itemOriginal = document.getElementById(`hilera-${hileraData.fila}`);
+            if (itemOriginal) {
+                itemOriginal.classList.add('completada');
+            }
+            if (hileraActualIndex < totalHilerasDatos.length - 1) {
+                hileraActualIndex++;
+                actualizarVistaTejerEnVivo();
+            } else {
+                alert('¡Felicitaciones! Llegaste a la última hilera del patrón.');
+            }
+        }
+
+        function cargarProyectosGuardados() {
+            const contenedor = document.getElementById('listaProyectosGuardados');
+            let proyectos = JSON.parse(localStorage.getItem('punto_creativo_proyectos') || '[]');
+            if (proyectos.length === 0) { contenedor.innerHTML = '<p style="font-size: 0.85rem; color: #d8c29d;">No hay proyectos guardados.</p>'; return; }
+            contenedor.innerHTML = '';
+            proyectos.forEach(p => {
+                const div = document.createElement('div');
+                div.style.cssText = "background: #221a15; padding: 10px; border-radius: 6px; margin-bottom: 8px; border: 1px solid var(--color-tierra); display: flex; justify-content: space-between; align-items: center;";
+                div.innerHTML = `<div><strong style="font-size: 0.9rem; color: var(--color-arena);">${p.nombre}</strong><p style="font-size: 0.75rem; color: #d8c29d;">${p.fecha}</p></div><img src="${p.imagen}" style="width: 40px; height: 40px; border-radius: 4px; image-rendering: pixelated; border: 1px solid #fff;">`;
+                contenedor.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
