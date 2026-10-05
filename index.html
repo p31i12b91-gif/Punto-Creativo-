@@ -1068,6 +1068,80 @@
                 listaHileras.appendChild(div);
             }
         }
+// 1. Tu paleta exacta de 60 colores con sus códigos HEX
+const PALETA_COLORES_EXACTOS = [
+    { nombre: "blanco", hex: "#FFFFFF" },
+    { nombre: "negro", hex: "#000000" },
+    { nombre: "gris claro", hex: "#D9D9D9" },
+    { nombre: "gris medio", hex: "#A6A6A6" },
+    { nombre: "gris oscuro", hex: "#666666" },
+    { nombre: "rojo", hex: "#FF0000" },
+    { nombre: "rojo oscuro", hex: "#8F3B2F" },
+    { nombre: "bordó", hex: "#800020" },
+    { nombre: "rosa", hex: "#FFC0CB" },
+    { nombre: "rosa viejo", hex: "#C08081" },
+    { nombre: "rosa mejilla", hex: "#D98276" },
+    { nombre: "magenta", hex: "#FF00FF" },
+    { nombre: "naranja", hex: "#FFA500" },
+    { nombre: "terracota", hex: "#E2725B" },
+    { nombre: "cobrizo", hex: "#B65A3C" },
+    { nombre: "amarillo", hex: "#FFFF00" },
+    { nombre: "mostaza", hex: "#D4A017" },
+    { nombre: "ocre", hex: "#CC7722" },
+    { nombre: "beige", hex: "#F5F5DC" },
+    { nombre: "crema", hex: "#FFF4D6" },
+    { nombre: "marfil", hex: "#FFF1E0" },
+    { nombre: "durazno", hex: "#F2B28D" },
+    { nombre: "arena", hex: "#D9A066" },
+    { nombre: "miel", hex: "#C98B5B" },
+    { nombre: "canela", hex: "#A86F4C" },
+    { nombre: "caramelo", hex: "#A0522D" },
+    { nombre: "marrón", hex: "#8B4513" },
+    { nombre: "marrón claro", hex: "#8B5A3C" },
+    { nombre: "marrón medio", hex: "#70452E" },
+    { nombre: "marrón oscuro", hex: "#4A2E20" },
+    { nombre: "chocolate", hex: "#7B3F00" },
+    { nombre: "marrón profundo", hex: "#38231C" },
+    { nombre: "verde", hex: "#008000" },
+    { nombre: "verde oliva", hex: "#808000" },
+    { nombre: "verde musgo", hex: "#8A9A5B" },
+    { nombre: "verde esmeralda", hex: "#50C878" },
+    { nombre: "verde oscuro", hex: "#245B35" },
+    { nombre: "celeste", hex: "#87CEEB" },
+    { nombre: "azul", hex: "#0000FF" },
+    { nombre: "azul marino", hex: "#000080" },
+    { nombre: "azul petróleo", hex: "#005F6A" },
+    { nombre: "azul profundo", hex: "#123B5D" },
+    { nombre: "violeta", hex: "#8F00FF" },
+    { nombre: "morado", hex: "#800080" },
+    { nombre: "lavanda", hex: "#B57EDC" },
+    { nombre: "piel clara", hex: "#F5D0B5" },
+    { nombre: "beige piel", hex: "#E8C39E" },
+    { nombre: "castaño claro", hex: "#8B5E3C" },
+    { nombre: "castaño", hex: "#654321" },
+    { nombre: "castaño oscuro", hex: "#4A2E20" },
+    { nombre: "rubio claro", hex: "#F3D58A" },
+    { nombre: "rubio dorado", hex: "#D4A84F" },
+    { nombre: "rubio oscuro", hex: "#A8793E" },
+    { nombre: "negro suave", hex: "#211A17" },
+    { nombre: "gris cabello", hex: "#8A8580" },
+    { nombre: "rojo labios", hex: "#9E3D4A" },
+    { nombre: "sombra cálida", hex: "#795548" },
+    { nombre: "sombra fría", hex: "#5A5360" },
+    { nombre: "sombra profunda", hex: "#3D2B27" },
+    { nombre: "negro sombra", hex: "#171717" }
+];
+
+// 2. Función auxiliar para convertir HEX a RGB
+function hexToRgb(hex) {
+    let bigint = parseInt(hex.replace("#", ""), 16);
+    let r = (bigint >> 16) & 255;
+    let g = (bigint >> 8) & 255;
+    let b = bigint & 255;
+    return [r, g, b];
+}
+
+// 3. Buscador del nombre exacto según tu tabla
 function obtenerNombreColor(colorRgbStr) {
     let match = colorRgbStr.match(/\d+/g);
     if (!match) return "puntos";
@@ -1075,53 +1149,43 @@ function obtenerNombreColor(colorRgbStr) {
     let g = parseInt(match[1]);
     let b = parseInt(match[2]);
 
-    let brillo = (r + g + b) / 3;
+    let menorDistancia = Infinity;
+    let nombreEncontrado = "personalizado";
 
-    if (brillo < 60) return "marrón oscuro";
-    if (brillo > 220 && Math.abs(r - g) < 15 && Math.abs(g - b) < 15) return "blanco";
+    for (let c of PALETA_COLORES_EXACTOS) {
+        let rgbTabla = hexToRgb(c.hex);
+        let distancia = Math.sqrt(
+            Math.pow(r - rgbTabla[0], 2) +
+            Math.pow(g - rgbTabla[1], 2) +
+            Math.pow(b - rgbTabla[2], 2)
+        );
 
-    if (r > 130 && r > g + 40 && r > b + 40) {
-        if (g < 70) return "rojo";
-        return "terracota";
+        if (distancia < menorDistancia) {
+            menorDistancia = distancia;
+            nombreEncontrado = c.nombre;
+        }
     }
 
-    if (r > g && g >= b && (r - b) > 30) {
-        if (brillo > 140) return "marrón claro";
-        return "marrón";
-    }
-
-    if (r > 150 && g > 150 && b < 100) return "amarillo";
-
-    if (g > r && g > b) {
-        if (r < 100 && b < 100) return "verde cardón";
-        return "verde";
-    }
-
-    if (r > 140 && b > 120 && g < 120) return "rosa";
-    if (b > r && b > g) return "azul";
-
-    if (brillo > 130) return "beige";
-    return "marrón";
+    return nombreEncontrado;
 }
 
-function leerHileraVoz() {
+// 4. Lector de voz exclusivo PRO para la hilera actual en vivo
+function leerHileraVozActual() {
     const esPro = esUsuarioPro() || esAdminApp();
     if (!esPro) { alert('🔒 Lectura de voz exclusiva de la Versión Pro.'); return; }
     if ('speechSynthesis' in window && totalHilerasDatos.length > 0) {
         window.speechSynthesis.cancel();
-        let hileraPendiente = totalHilerasDatos.find(h => !document.getElementById(`hilera-${h.fila}`).classList.contains('completada'));
-        if (hileraPendiente) {
-            let textoDictado = `Hilera ${hileraPendiente.fila}. `;
-            
-            hileraPendiente.bloques.forEach((b) => {
+        let hileraData = totalHilerasDatos[hileraActualIndex];
+        if (hileraData) {
+            let textoDictado = `Hilera ${hileraData.fila}. `;
+            hileraData.bloques.forEach((b) => {
                 let nombreColor = obtenerNombreColor(b.color);
                 textoDictado += `${b.cantidad} puntos color ${nombreColor}. `;
             });
-
             const utterance = new SpeechSynthesisUtterance(textoDictado);
             utterance.lang = 'es-AR';
             window.speechSynthesis.speak(utterance);
-        } else { alert('¡Completaste todas las hileras!'); }
+        }
     }
 }
 
@@ -1153,37 +1217,39 @@ function leerHileraVoz() {
             actualizarVistaTejerEnVivo();
         }
 
-        function crearModalTejerEnVivo() {
-            let modalExistente = document.getElementById('modalTejerEnVivo');
-            if (modalExistente) {
-                modalExistente.remove();
-            }
+// 5. Modal de Tejer en Vivo con el botón de voz integrado
+function crearModalTejerEnVivo() {
+    let modalExistente = document.getElementById('modalTejerEnVivo');
+    if (modalExistente) {
+        modalExistente.remove();
+    }
 
-            const modal = document.createElement('div');
-            modal.id = 'modalTejerEnVivo';
-            modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 20px;";
+    const modal = document.createElement('div');
+    modal.id = 'modalTejerEnVivo';
+    modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 20px;";
+    
+    modal.innerHTML = `
+        <div style="background: #2e241e; border: 2px solid var(--color-terracota); border-radius: 12px; padding: 20px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.6);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--color-tierra); padding-bottom: 8px;">
+                <h3 style="font-size: 1.1rem; color: var(--color-arena);">🧶 Tejiendo en Vivo Paso a Paso</h3>
+                <button onclick="document.getElementById('modalTejerEnVivo').remove()" style="background: none; border: none; color: white; font-size: 1.3rem; cursor: pointer;">✕</button>
+            </div>
             
-            modal.innerHTML = `
-                <div style="background: #2e241e; border: 2px solid var(--color-terracota); border-radius: 12px; padding: 20px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.6);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--color-tierra); padding-bottom: 8px;">
-                        <h3 style="font-size: 1.1rem; color: var(--color-arena);">🧶 Tejiendo en Vivo Paso a Paso</h3>
-                        <button onclick="document.getElementById('modalTejerEnVivo').remove()" style="background: none; border: none; color: white; font-size: 1.3rem; cursor: pointer;">✕</button>
-                    </div>
-                    
-                    <div id="vivoContenedorHilera" style="background: #221a15; padding: 20px; border-radius: 8px; border: 1px solid var(--color-tierra); margin-bottom: 20px; min-height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                    </div>
+            <div id="vivoContenedorHilera" style="background: #221a15; padding: 20px; border-radius: 8px; border: 1px solid var(--color-tierra); margin-bottom: 15px; min-height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            </div>
 
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <button class="btn-secondary" onclick="cambiarHileraVivo(-1)" style="background-color: var(--color-tierra);">⬅ Hilera Anterior</button>
-                        <button class="btn-primary" onclick="cambiarHileraVivo(1)" style="background-color: var(--color-terracota); margin-top:0;">Hilera Siguiente ➡</button>
-                    </div>
+            <button class="btn-primary" onclick="leerHileraVozActual()" style="background-color: var(--color-cardon); margin-bottom: 15px;">🔊 Escuchar Hilera <span class="badge-pro">PRO</span></button>
 
-                    <button onclick="marcarYAvanzarVivo()" class="btn-secondary" style="background-color: var(--color-cardon); width: 100%;">✔ Marcar completada y pasar a la siguiente</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="btn-secondary" onclick="cambiarHileraVivo(-1)" style="background-color: var(--color-tierra);">⬅ Hilera Anterior</button>
+                <button class="btn-primary" onclick="cambiarHileraVivo(1)" style="background-color: var(--color-terracota); margin-top:0;">Hilera Siguiente ➡</button>
+            </div>
+
+            <button onclick="marcarYAvanzarVivo()" class="btn-secondary" style="background-color: var(--color-cardon); width: 100%;">✔ Marcar completada y pasar a la siguiente</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
         }
-
         function actualizarVistaTejerEnVivo() {
             const contenedorVivo = document.getElementById('vivoContenedorHilera');
             if (!contenedorVivo) return;
