@@ -1070,20 +1070,25 @@
         }
 
         function leerHileraVoz() {
-            const esPro = esUsuarioPro() || esAdminApp();
-            if (!esPro) { alert('🔒 Lectura de voz exclusiva de la Versión Pro.'); return; }
-            if ('speechSynthesis' in window && totalHilerasDatos.length > 0) {
-                window.speechSynthesis.cancel();
-                let hileraPendiente = totalHilerasDatos.find(h => !document.getElementById(`hilera-${h.fila}`).classList.contains('completada'));
-                if (hileraPendiente) {
-                    let textoDictado = `Hilera ${hileraPendiente.fila}. `;
-                    hileraPendiente.bloques.forEach(b => { textoDictado += `${b.cantidad} puntos. `; });
-                    const utterance = new SpeechSynthesisUtterance(textoDictado);
-                    utterance.lang = 'es-AR';
-                    window.speechSynthesis.speak(utterance);
-                } else { alert('¡Completaste todas las hileras!'); }
-            }
-        }
+    const esPro = esUsuarioPro() || esAdminApp();
+    if (!esPro) { alert('🔒 Lectura de voz exclusiva de la Versión Pro.'); return; }
+    if ('speechSynthesis' in window && totalHilerasDatos.length > 0) {
+        window.speechSynthesis.cancel();
+        let hileraPendiente = totalHilerasDatos.find(h => !document.getElementById(`hilera-${h.fila}`).classList.contains('completada'));
+        if (hileraPendiente) {
+            let textoDictado = `Hilera ${hileraPendiente.fila}. `;
+            
+            hileraPendiente.bloques.forEach((b, index) => {
+                // Traducimos un poco el color rgb a un término amigable o indicamos cambio de tono
+                textoDictado += `${b.cantidad} puntos de color ${b.color}. `;
+            });
+
+            const utterance = new SpeechSynthesisUtterance(textoDictado);
+            utterance.lang = 'es-AR';
+            window.speechSynthesis.speak(utterance);
+        } else { alert('¡Completaste todas las hileras!'); }
+    }
+}
 
         function imprimirPdfPro() {
             if (!esUsuarioPro() && !esAdminApp()) { alert('🔒 Exclusivo Versión Pro.'); return; }
