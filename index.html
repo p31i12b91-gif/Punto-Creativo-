@@ -875,37 +875,120 @@
         }
 
         function renderizarBiblioteca() {
-            const contenedor = document.getElementById('contenedorBibliotecaDinamica');
-            const esPro = esUsuarioPro() || esAdminApp();
-            
-            let baseNotas = {
-                crochet: [{ titulo: "Punto Cadena y Medio Punto", detalle: "Bases fundamentales para iniciar diagramas en crochet y tapestry." }],
-                tricot: [{ titulo: "Punto Derecho y Revés", detalle: "La estructura base para tricot y jacquard en dos agujas." }],
-                telar: [{ titulo: "Trama y Urdimbre", detalle: "Conceptos iniciales para tejido artesanal en telar vertical y horizontal." }],
-                macrame: [{ titulo: "Nudo Llano", detalle: "Nudo clásico para la creación de tramas decorativas y soportes." }]
-            };
+    const contenedorBiblioteca = document.getElementById('contenidoBiblioteca') || document.getElementById('bibliotecaContainer');
+    if (!contenedorBiblioteca) return;
 
-            let notasCustom = JSON.parse(localStorage.getItem('punto_creativo_notas') || '[]');
-            let notasFiltradasCustom = notasCustom.filter(n => n.categoria === categoriaActualBiblio);
-            let notasBaseFiltradas = baseNotas[categoriaActualBiblio] || [];
+    const esPro = esUsuarioPro() || esAdminApp();
 
-            let html = '';
-            notasBaseFiltradas.forEach(n => {
-                html += `<div class="biblio-categoria"><h3>🧶 ${n.titulo}</h3><p>${n.detalle}</p></div>`;
-            });
+    contenedorBiblioteca.innerHTML = `
+        <div style="padding: 20px; max-width: 900px; margin: 0 auto; color: var(--color-arena);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-tierra); padding-bottom: 8px; margin-bottom: 20px;">
+                <h2 style="color: var(--color-terracota); margin: 0; font-size: 1.4rem;">🧶 Técnicas y Biblioteca Textil</h2>
+                <span style="font-size: 0.8rem; background: ${esPro ? 'var(--color-pro)' : '#444'}; color: ${esPro ? '#221a15' : 'var(--color-arena)'}; padding: 4px 10px; border-radius: 12px; font-weight: bold;">
+                    ${esPro ? '🌟 Biblioteca Completa Pro' : '📖 Versión Gratuita (Puntos Base)'}
+                </span>
+            </div>
 
-            if (notasFiltradasCustom.length > 0) {
-                html += `<h3 style="font-size:0.9rem; color:var(--color-pro); margin: 12px 0 6px 0;">⭐ Apuntes Especiales Pro</h3>`;
-                notasFiltradasCustom.forEach(n => {
-                    if (esPro) {
-                        html += `<div class="biblio-categoria" style="border-left-color: var(--color-pro);"><h3>📌 ${n.titulo} <span class="badge-pro">PRO</span></h3><p>${n.detalle.replace(/\n/g, '<br>')}</p></div>`;
-                    } else {
-                        html += `<div class="biblio-categoria" style="opacity: 0.6;"><h3>🔒 ${n.titulo} <span class="badge-pro">PRO</span></h3><p>Apunte avanzado exclusivo de la Versión Pro.</p></div>`;
-                    }
-                });
-            }
-            contenedor.innerHTML = html;
-        }
+            <p style="margin-bottom: 25px; font-size: 0.95rem; line-height: 1.5;">
+                ${esPro ? 'Tenés acceso completo a todas las guías, puntos base y futuras actualizaciones de tramas exclusivas.' : 'Guía fundamental de puntos base. Las nuevas tramas y catálogos avanzados que se agreguen próximamente estarán disponibles en la Versión Pro.'}
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                
+                <!-- 1. CROCHET -->
+                <div style="background: #2e241e; border: 1px solid var(--color-tierra); border-radius: 8px; padding: 18px;">
+                    <h3 style="color: var(--color-terracota); margin-bottom: 12px; font-size: 1.2rem;">1. Crochet</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5;">El crochet se trabaja con una aguja de gancho. Los puntos se construyen mediante lazadas y se representan en los diagramas mediante símbolos gráficos.</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Cadena:</strong> Símbolo <code>"○"</code>. Base de muchos trabajos. Se realiza tomando el hilo con el gancho y pasándolo a través del lazo en la aguja. <br><small style="color:var(--color-arena); opacity:0.8;">Secuencia: "○—○—○—○—○"</small>
+                        </div>
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Medio punto (Punto bajo):</strong> Símbolo <code>"×"</code>. Tejido bajo, firme y compacto. Se introduce el gancho, se extrae lazada y se cierra pasando el hilo por las dos lazadas del gancho.
+                        </div>
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Media vareta:</strong> Símbolo <code>"T̶"</code>. Comienza con lazada, se introduce en el punto, se extrae lazada y se cierra por las tres lazadas del gancho. Altura media.
+                        </div>
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Vareta simple:</strong> Símbolo <code>"T̶"</code>. Se realiza haciendo una lazada, introduciendo el gancho y cerrando las lazadas en dos pasos. Punto más alto y flexible.
+                        </div>
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Vareta triple:</strong> Símbolo <code>"T̶̶̶"</code>. Lleva tres lazadas iniciales sobre el gancho y se van cerrando de a dos. Punto alto, abierto y decorativo.
+                        </div>
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Punto elástico:</strong> Se obtiene mediante puntos en relieve (delanteros y traseros alternados), generando canales verticales con elasticidad para puños y cinturillas.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. TRICOT -->
+                <div style="background: #2e241e; border: 1px solid var(--color-tierra); border-radius: 8px; padding: 18px;">
+                    <h3 style="color: var(--color-terracota); margin-bottom: 12px; font-size: 1.2rem;">2. Tricot (Dos Agujas)</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5;">Se trabaja con dos agujas combinando puntos al derecho y al revés.</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Montado de puntos:</strong> Procedimiento inicial (nudo corredizo, lazadas sucesivas sobre la aguja) para fijar la base del trabajo.
+                        </div>
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Punto Jersey:</strong> Alterna 1 vuelta al derecho y 1 vuelta al revés. Superficie lisa con pequeñas "V" en el derecho.
+                        </div>
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Punto Santa Clara:</strong> Todas las vueltas al derecho. Ondas horizontales y tejido muy estable.
+                        </div>
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Elástico simple y doble:</strong> Alternancia de 1d/1r o 2d/2r para producir canales verticales flexibles.
+                        </div>
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Arroz simple y doble:</strong> Textura granulada a base de alternar derechos y revés intercalados en cada vuelta.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. TELAR CUADRADO Y DISEÑOS -->
+                <div style="background: #2e241e; border: 1px solid var(--color-tierra); border-radius: 8px; padding: 18px;">
+                    <h3 style="color: var(--color-terracota); margin-bottom: 12px; font-size: 1.2rem;">3. Telar y Diseños</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5;">Utiliza urdimbre (longitudinal) y trama (transversal).</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Tafetán:</strong> Estructura básica donde la trama pasa alternativamente 1 arriba y 1 abajo.
+                        </div>
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Sarga:</strong> Desplaza progresivamente los cruces formando líneas diagonales.
+                        </div>
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🎨 Diseños tradicionales:</strong> Pie de pool (pata de gallo), Cuadrillé, Escocés y Barracán (tejidos texturados de abrigo).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. MACRAMÉ -->
+                <div style="background: #2e241e; border: 1px solid var(--color-tierra); border-radius: 8px; padding: 18px;">
+                    <h3 style="color: var(--color-terracota); margin-bottom: 12px; font-size: 1.2rem;">4. Macramé</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5;">Técnica de nudos manuales con cordones o hilos.</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
+                        <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                            <strong>🔹 Nudo plano:</strong> Utiliza dos cordones centrales y dos laterales que se cruzan alternando el sentido, logrando superficies planas y estables para tapices y accesorios.
+                        </div>
+                    </div>
+                </div>
+
+                ${!esPro ? `
+                <!-- AVISO DE CONTENIDO FUTURO PRO -->
+                <div style="background: linear-gradient(135deg, #2e241e 0%, #3a2a22 100%); border: 1px dashed var(--color-terracota); border-radius: 8px; padding: 18px; text-align: center;">
+                    <h4 style="color: var(--color-terracota); margin-bottom: 8px;">🔒 Próximos Puntos y Tramas Avanzadas (Exclusivo Pro)</h4>
+                    <p style="font-size: 0.85rem; color: var(--color-arena); opacity: 0.9; margin: 0;">Las próximas actualizaciones incluirán diagramas vectoriales interactivos, puntos ornamentales complejos y catálogos de diseño exclusivos para usuarios Pro.</p>
+                </div>
+                ` : ''}
+
+            </div>
+        </div>
+    `;
+}
+
 
         function agregarNotaBiblioteca() {
             const cat = document.getElementById('nuevaCategoria').value;
