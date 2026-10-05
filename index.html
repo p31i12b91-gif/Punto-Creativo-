@@ -1068,8 +1068,43 @@
                 listaHileras.appendChild(div);
             }
         }
+function obtenerNombreColor(colorRgbStr) {
+    let match = colorRgbStr.match(/\d+/g);
+    if (!match) return "puntos";
+    let r = parseInt(match[0]);
+    let g = parseInt(match[1]);
+    let b = parseInt(match[2]);
 
-        function leerHileraVoz() {
+    let brillo = (r + g + b) / 3;
+
+    if (brillo < 60) return "marrón oscuro";
+    if (brillo > 220 && Math.abs(r - g) < 15 && Math.abs(g - b) < 15) return "blanco";
+
+    if (r > 130 && r > g + 40 && r > b + 40) {
+        if (g < 70) return "rojo";
+        return "terracota";
+    }
+
+    if (r > g && g >= b && (r - b) > 30) {
+        if (brillo > 140) return "marrón claro";
+        return "marrón";
+    }
+
+    if (r > 150 && g > 150 && b < 100) return "amarillo";
+
+    if (g > r && g > b) {
+        if (r < 100 && b < 100) return "verde cardón";
+        return "verde";
+    }
+
+    if (r > 140 && b > 120 && g < 120) return "rosa";
+    if (b > r && b > g) return "azul";
+
+    if (brillo > 130) return "beige";
+    return "marrón";
+}
+
+function leerHileraVoz() {
     const esPro = esUsuarioPro() || esAdminApp();
     if (!esPro) { alert('🔒 Lectura de voz exclusiva de la Versión Pro.'); return; }
     if ('speechSynthesis' in window && totalHilerasDatos.length > 0) {
@@ -1078,9 +1113,9 @@
         if (hileraPendiente) {
             let textoDictado = `Hilera ${hileraPendiente.fila}. `;
             
-            hileraPendiente.bloques.forEach((b, index) => {
-                // Traducimos un poco el color rgb a un término amigable o indicamos cambio de tono
-                textoDictado += `${b.cantidad} puntos de color ${b.color}. `;
+            hileraPendiente.bloques.forEach((b) => {
+                let nombreColor = obtenerNombreColor(b.color);
+                textoDictado += `${b.cantidad} puntos color ${nombreColor}. `;
             });
 
             const utterance = new SpeechSynthesisUtterance(textoDictado);
