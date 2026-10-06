@@ -868,6 +868,7 @@
         }
 
                         function generarNuevoCodigoPro() {
+    let nombreUser = document.getElementById('adminNombreUser').value.trim() || 'Sin nombre';
     let meses = parseInt(document.getElementById('adminMesesUser').value) || 1;
 
     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -881,9 +882,10 @@
     
     let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
     
-    // Guardamos el código, los meses (cada uno de 30 días) y la fecha de creación
+    // Guardamos el código, el nombre del usuario, los meses y la fecha de creación
     listaCodigos.push({ 
         codigo: codigoGenerado, 
+        usuario: nombreUser, // <--- Aquí es donde se graba el nombre del usuario
         meses: meses, 
         diasTotales: meses * 30,
         creado: new Date().toLocaleDateString(), 
@@ -892,8 +894,9 @@
     
     localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
 
+    document.getElementById('adminNombreUser').value = ''; // Limpia el campo del nombre
     renderizarListaCodigosAdmin();
-    alert(`¡Código creado con éxito!\n${codigoGenerado}`);
+    alert(`¡Código creado con éxito para ${nombreUser}!\n${codigoGenerado}`);
 }
 
 
@@ -908,7 +911,11 @@
     
     let html = '';
     listaCodigos.forEach(item => {
-        let estadoTxt = item.utilizado ? `<span style="color: #2ecc71;">(Usado / Entregado)</span>` : `<span style="color: var(--color-pro);">(Pendiente)</span>`;
+        // Muestra el estado y el nombre del usuario asignado
+        let estadoTxt = item.utilizado 
+            ? `<span style="color: #2ecc71;">(Usado por: ${item.usuario || 'Desconocido'})</span>` 
+            : `<span style="color: var(--color-pro);">(Pendiente - ${item.usuario || 'Sin nombre'})</span>`;
+            
         let duracionDias = item.meses * 30; // Control estricto de 30 días por mes
         
         html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #332720; font-size: 0.75rem;">
