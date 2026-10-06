@@ -1717,38 +1717,33 @@ function actualizarCanvasTejerVivo() {
     const canvasVivo = document.getElementById('canvasTejerVivo');
     if (!canvasPrincipal || !canvasVivo) return;
 
-    const ctxPrincipal = canvasPrincipal.getContext('2d');
     const ctxVivo = canvasVivo.getContext('2d');
 
     // Copiamos las dimensiones exactas del canvas original
     canvasVivo.width = canvasPrincipal.width;
     canvasVivo.height = canvasPrincipal.height;
 
-    // Dibujamos la imagen original completa
+    // 1. Dibujamos la imagen original completa y nítida
     ctxVivo.clearRect(0, 0, canvasVivo.width, canvasVivo.height);
     ctxVivo.drawImage(canvasPrincipal, 0, 0);
 
-    // Si estamos tejiendo, oscurecemos o desaturamos las hileras ya pasadas
-    // En gráficos de tejido estilo matriz, la hilera 0 suele estar abajo o arriba según cómo se lea.
-    // Vamos a calcular la coordenada Y de los píxeles según la altura total y la cantidad de hileras.
     const totalHileras = totalHilerasDatos.length;
+    if (totalHileras === 0) return;
+
     const altoPorHilera = canvasVivo.height / totalHileras;
 
-    // Las hileras que ya pasaron (índices menores a hileraActualIndex) se apagan visualmente
-    // Dependiendo de si tu patrón se lee de abajo hacia arriba o de arriba hacia abajo:
-    // Por lo general, hileraActualIndex 0 es la primera. Vamos a apagar las anteriores.
-    
-    ctxVivo.fillStyle = "rgba(0, 0, 0, 0.75);"; // Capa semi-oscura para apagar
-    
-    for (let i = 0; i < totalHileras; i++) {
-        if (i < hileraActualIndex) {
-            // Dependiendo del sentido de tu matriz, ajustamos la posición Y
-            // Asumiendo orden visual de arriba hacia abajo (o invertido si tu canvas dibuja al revés)
-            let yPos = (totalHileras - 1 - i) * altoPorHilera; // Si empieza de abajo hacia arriba
-            // Si prefieres de arriba hacia abajo, usa: let yPos = i * altoPorHilera;
+    // 2. Recorremos cada hilera para oscurecer las ya completadas (de abajo hacia arriba)
+    totalHilerasDatos.forEach((hileraData, index) => {
+        // Ignoramos la hilera 0 (cadenas de base) para que no se oscurezca con el tejido
+        if (index < hileraActualIndex && hileraData.fila !== 0 && hileraData.fila !== '0') {
+            // Calculamos la posición Y exacta de abajo hacia arriba
+            let yPos = canvasVivo.height - ((index + 1) * altoPorHilera);
+            
+            // Pintamos la capa semitransparente para "apagar" esa hilera de color terminada
+            ctxVivo.fillStyle = "rgba(0, 0, 0, 0.70)";
             ctxVivo.fillRect(0, yPos, canvasVivo.width, altoPorHilera);
         }
-    }
+    });
 }
 
 function ajustarZoomModal(delta) {
