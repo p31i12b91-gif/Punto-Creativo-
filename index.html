@@ -771,10 +771,13 @@
             }
         }
 
-        function activarCodigoPro() {
+                function activarCodigoPro() {
+            // Obtenemos el código ingresado pero pasamos AMBOS lados a minúsculas para comparar sin errores de mayúsculas
             let codigoIngresado = document.getElementById('inputCodigoPro').value.trim().toLowerCase();
             let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
-            let index = listaCodigos.findIndex(c => c.codigo === codigoIngresado && !c.utilizado);
+            
+            // Buscamos comparando en minúsculas para que no importe cómo se tipeó
+            let index = listaCodigos.findIndex(c => c.codigo.toLowerCase() === codigoIngresado && !c.utilizado);
 
             if (index !== -1) {
                 let item = listaCodigos[index];
@@ -793,6 +796,7 @@
                 alert('Código inválido o ya utilizado.');
             }
         }
+
 
         function intentarAbrirAdmin() {
             contadorClicksHeader++;
