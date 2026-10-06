@@ -845,7 +845,6 @@
 
     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let aleatorio = '';
-    // Generamos 12 caracteres continuos sin guiones para mayor seguridad
     for (let i = 0; i < 12; i++) {
         aleatorio += chars.charAt(Math.floor(Math.random() * chars.length));
     }
@@ -854,9 +853,12 @@
     let codigoGenerado = `Creativo-${meses}-${aleatorio}`;
     
     let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
+    
+    // Guardamos el código, los meses (cada uno de 30 días) y la fecha de creación
     listaCodigos.push({ 
         codigo: codigoGenerado, 
         meses: meses, 
+        diasTotales: meses * 30,
         creado: new Date().toLocaleDateString(), 
         utilizado: false 
     });
@@ -867,20 +869,32 @@
     alert(`¡Código creado con éxito!\n${codigoGenerado}`);
 }
 
+
         function renderizarListaCodigosAdmin() {
-            let contenedor = document.getElementById('listaCodigosAdminContenedor');
-            let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
-            if (listaCodigos.length === 0) { contenedor.innerHTML = '<p style="font-size: 0.75rem; color: #a89270;">Sin códigos.</p>'; return; }
-            let html = '';
-            listaCodigos.forEach(item => {
-                let estadoTxt = item.utilizado ? `<span style="color: #2ecc71;">(Usado)</span>` : `<span style="color: var(--color-pro);">(Pendiente)</span>`;
-                html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #332720; font-size: 0.75rem;">
-                    <div><strong style="color: var(--color-arena);">${item.codigo}</strong> ${estadoTxt} (${item.meses}m)</div>
-                    <button onclick="eliminarCodigoAdmin('${item.codigo}')" style="background: none; border: none; color: #e74c3c; cursor: pointer;">❌</button>
-                </div>`;
-            });
-            contenedor.innerHTML = html;
-        }
+    let contenedor = document.getElementById('listaCodigosAdminContenedor');
+    let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
+    
+    if (listaCodigos.length === 0) { 
+        contenedor.innerHTML = '<p style="font-size: 0.75rem; color: #a89270;">Sin códigos generados.</p>'; 
+        return; 
+    }
+    
+    let html = '';
+    listaCodigos.forEach(item => {
+        let estadoTxt = item.utilizado ? `<span style="color: #2ecc71;">(Usado / Entregado)</span>` : `<span style="color: var(--color-pro);">(Pendiente)</span>`;
+        let duracionDias = item.meses * 30; // Control estricto de 30 días por mes
+        
+        html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #332720; font-size: 0.75rem;">
+            <div>
+                <strong style="color: var(--color-arena);">${item.codigo}</strong> ${estadoTxt}<br>
+                <span style="color: #c5b395; font-size: 0.7rem;">Duración: ${item.meses} mes(es) (${duracionDias} días) | Creado: ${item.creado}</span>
+            </div>
+            <button onclick="eliminarCodigoAdmin('${item.codigo}')" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1rem;">❌</button>
+        </div>`;
+    });
+    
+    contenedor.innerHTML = html;
+}
 
 
         function eliminarCodigoAdmin(codigo) {
