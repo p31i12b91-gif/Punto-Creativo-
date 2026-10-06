@@ -6,16 +6,17 @@
     <title>Punto Creativo - Tapestry y Jacquard</title>
     <style>
          <!-- 📌 Enlaces para la PWA (Aplicación Móvil) -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#b25539">
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
+          navigator.serviceWorker.register('./sw.js')
             .then(reg => console.log('Service Worker registrado con éxito', reg))
             .catch(err => console.log('Error al registrar el Service Worker', err));
         });
       }
+    </script>
         :root {
             --color-terracota: #a34c30;
             --color-tierra: #6b3e26;
