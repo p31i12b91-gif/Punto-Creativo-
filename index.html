@@ -777,24 +777,43 @@
     
     let codigoIngresado = inputElem.value.trim();
     
-    // Valida exactamente que tenga 3 partes: Creativo, el número de meses, y los caracteres seguidos sin más guiones
+    // 1. Valida exactamente el formato (Creativo - meses - caracteres)
     let regexValidador = /^creativo-(\d+)-[a-zA-Z0-9]{10,15}$/i;
     let coincidencia = codigoIngresado.match(regexValidador);
 
-    if (coincidencia) {
-        let meses = parseInt(coincidencia[1]);
-        let duracionMs = meses * 30 * 24 * 60 * 60 * 1000;
-        let expiraTiempo = new Date().getTime() + duracionMs;
-        
-        localStorage.setItem('punto_creativo_pro', JSON.stringify({ expira: expiraTiempo }));
-
-        inputElem.value = '';
-        if (typeof verificarEstadoPro === 'function') verificarEstadoPro();
-        alert(`¡Felicitaciones! Versión Pro activada por ${meses} mes(es) con éxito.`);
-    } else {
+    if (!coincidencia) {
         alert('Código inválido o falso.');
+        return;
     }
-}
+
+    let meses = parseInt(coincidencia[1]);
+    let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
+    
+    // 2. Control de un solo uso contra tu base de códigos generados
+    let index = listaCodigos.findIndex(c => c.codigo.toLowerCase() === codigoIngresado.toLowerCase());
+
+    if (index !== -1) {
+        if (listaCodigos[index].utilizado) {
+            alert('❌ Este código ya fue utilizado anteriormente y no puede volver a usarse.');
+            return;
+        }
+        // Lo marcamos como utilizado en la base del panel
+        listaCodigos[index].utilizado = true;
+        listaCodigos[index].fechaUso = new Date().toLocaleDateString();
+        localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
+    }
+
+    // 3. Calcula los días (30 días por mes) y activa la versión Pro
+    let duracionMs = meses * 30 * 24 * 60 * 60 * 1000;
+    let expiraTiempo = new Date().getTime() + duracionMs;
+    
+    localStorage.setItem('punto_creativo_pro', JSON.stringify({ expira: expiraTiempo, codigoUsado: codigoIngresado }));
+
+    inputElem.value = '';
+    if (typeof verificarEstadoPro === 'function') verificarEstadoPro();
+    alert(`¡Felicitaciones! Versión Pro activada por ${meses} mes(es) (${meses * 30} días) con éxito.`);
+    
+    if (typeof renderizarLista
 
 
         function intentarAbrirAdmin() {
