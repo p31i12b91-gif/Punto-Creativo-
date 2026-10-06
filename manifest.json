@@ -1,0 +1,17 @@
+{
+  "name": "Biblioteca de Técnicas de Tejido",
+  "short_name": "TejidoApp",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#221a15",
+  "theme_color": "#b25539",
+  "description": "Aplicación de consulta y administración para técnicas de tejido.",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
