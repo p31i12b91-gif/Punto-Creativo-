@@ -1,9 +1,10 @@
 const CACHE_NAME = 'tejiendo-app-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 // 1. Instalación del Service Worker y guardado en caché
@@ -43,11 +44,9 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Si hay internet, devuelve la respuesta de la red
         return response;
       })
       .catch(() => {
-        // Si falla la red (sin conexión), busca el archivo en la caché
         return caches.match(event.request);
       })
   );
