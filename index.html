@@ -1362,30 +1362,45 @@ function seleccionarTecnicaBiblioteca(tecnica) {
         }
 
         document.getElementById('btnGenerar').addEventListener('click', function() {
-            const ancho = parseInt(document.getElementById('anchoPuntos').value) || 20;
-            const alto = parseInt(document.getElementById('altoPuntos').value) || 20;
-            const colores = parseInt(document.getElementById('cantColores').value) || 4;
-            const esPro = esUsuarioPro() || esAdminApp();
+    const ancho = parseInt(document.getElementById('anchoPuntos').value) || 20;
+    const alto = parseInt(document.getElementById('altoPuntos').value) || 20;
+    const colores = parseInt(document.getElementById('cantColores').value) || 4;
+    const esPro = esUsuarioPro() || esAdminApp();
 
-            if (!esPro && (ancho > 40 || alto > 40 || colores > 6)) {
-                alert('⚠️ La Versión Gratuita permite un máximo de 40x40 puntos y 6 colores. Activá la Versión Pro para medidas superiores.');
-                return;
-            }
+    // 📌 Bloque de validación y redirección a Pro
+    if (!esPro && (ancho > 40 || alto > 40 || colores > 6)) {
+        let mensaje = "⚠️ ¡Límite de la Versión Gratuita superado!\n\n";
+        if (ancho > 40 || alto > 40) {
+            mensaje += `• El tamaño máximo permitido es de 40x40 (intentaste usar ${ancho}x${alto}).\n`;
+        }
+        if (colores > 6) {
+            mensaje += `• El máximo de colores permitido es 6 (intentaste usar ${colores}).\n`;
+        }
+        mensaje += "\n¿Querés ir a la sección de Perfil y Suscripción para activar la Versión Pro?";
 
-            resetZoom();
-            const inputImg = document.getElementById('imagenInput');
-            if (inputImg.files && inputImg.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() { procesarImagen(img, ancho, alto); }
-                    img.src = e.target.result;
-                }
-                reader.readAsDataURL(inputImg.files[0]);
-            } else {
-                generarPatronPrueba(ancho, alto);
+        if (confirm(mensaje)) {
+            const seccionPerfil = document.getElementById('seccion-perfil');
+            if (seccionPerfil) {
+                seccionPerfil.scrollIntoView({ behavior: 'smooth' });
             }
-        });
+        }
+        return;
+    }
+
+    resetZoom();
+    const inputImg = document.getElementById('imagenInput');
+    if (inputImg.files && inputImg.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() { procesarImagen(img, ancho, alto); }
+            img.src = e.target.result;
+        }
+        reader.readAsDataURL(inputImg.files[0]);
+    } else {
+        generarPatronPrueba(ancho, alto);
+    }
+});
 
         function procesarImagen(img, ancho, alto) {
             const canvas = document.getElementById('canvasPatron');
