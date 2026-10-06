@@ -1649,47 +1649,62 @@ function crearModalTejerEnVivo() {
         modalExistente.remove();
     }
 
+    // Obtenemos la imagen actual del canvas principal para mostrarla en el modal
+    const canvasPrincipal = document.getElementById('canvasPatron');
+    let imagenSrc = "";
+    if (canvasPrincipal) {
+        imagenSrc = canvasPrincipal.toDataURL();
+    }
+
     const modal = document.createElement('div');
     modal.id = 'modalTejerEnVivo';
-    modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 20px;";
+    modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 15px; overflow-y: auto;";
     
     modal.innerHTML = `
-        <div style="background: #2e241e; border: 2px solid var(--color-terracota); border-radius: 12px; padding: 20px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.6);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--color-tierra); padding-bottom: 8px;">
-                <h3 style="font-size: 1.1rem; color: var(--color-arena);">🧶 Tejiendo en Vivo Paso a Paso</h3>
-                <button onclick="document.getElementById('modalTejerEnVivo').remove()" style="background: none; border: none; color: white; font-size: 1.3rem; cursor: pointer;">✕</button>
+        <div style="background: #2e241e; border: 2px solid var(--color-terracota); border-radius: 12px; padding: 15px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.6); max-height: 95vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--color-tierra); padding-bottom: 6px;">
+                <h3 style="font-size: 1rem; color: var(--color-arena);">🧶 Tejiendo en Vivo Paso a Paso</h3>
+                <button onclick="document.getElementById('modalTejerEnVivo').remove()" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer;">✕</button>
             </div>
             
-            <div id="vivoContenedorHilera" style="background: #221a15; padding: 20px; border-radius: 8px; border: 1px solid var(--color-tierra); margin-bottom: 15px; min-height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <!-- 🖼️ Miniatura de la imagen original a desarrollar -->
+            ${imagenSrc ? `
+            <div style="margin-bottom: 12px; background: #221a15; padding: 8px; border-radius: 8px; border: 1px solid var(--color-tierra);">
+                <p style="font-size: 0.75rem; color: var(--color-arena); margin-bottom: 5px;">Diseño del Patrón:</p>
+                <img src="${imagenSrc}" style="width: 90px; height: 90px; object-fit: contain; image-rendering: pixelated; border-radius: 4px; border: 1px solid #fff; background: #000;">
+            </div>` : ''}
+
+            <div id="vivoContenedorHilera" style="background: #221a15; padding: 15px; border-radius: 8px; border: 1px solid var(--color-tierra); margin-bottom: 12px; min-height: 90px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
             </div>
 
-            <button class="btn-primary" onclick="leerHileraVozActual()" style="background-color: var(--color-cardon); margin-bottom: 15px;">🔊 Escuchar Hilera <span class="badge-pro">PRO</span></button>
+            <button class="btn-primary" onclick="leerHileraVozActual()" style="background-color: var(--color-cardon); margin-bottom: 12px; width: 100%;">🔊 Escuchar Hilera <span class="badge-pro">PRO</span></button>
 
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <button class="btn-secondary" onclick="cambiarHileraVivo(-1)" style="background-color: var(--color-tierra);">⬅ Hilera Anterior</button>
-                <button class="btn-primary" onclick="cambiarHileraVivo(1)" style="background-color: var(--color-terracota); margin-top:0;">Hilera Siguiente ➡</button>
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <button class="btn-secondary" onclick="cambiarHileraVivo(-1)" style="background-color: var(--color-tierra); flex: 1;">⬅ Anterior</button>
+                <button class="btn-primary" onclick="cambiarHileraVivo(1)" style="background-color: var(--color-terracota); margin-top:0; flex: 1;">Siguiente ➡</button>
             </div>
 
-            <button onclick="marcarYAvanzarVivo()" class="btn-secondary" style="background-color: var(--color-cardon); width: 100%;">✔ Marcar completada y pasar a la siguiente</button>
+            <button onclick="marcarYAvanzarVivo()" class="btn-secondary" style="background-color: var(--color-cardon); width: 100%;">✔ Marcar completada y avanzar</button>
         </div>
     `;
     document.body.appendChild(modal);
-        }
-        function actualizarVistaTejerEnVivo() {
-            const contenedorVivo = document.getElementById('vivoContenedorHilera');
-            if (!contenedorVivo) return;
+}
 
-            let hileraData = totalHilerasDatos[hileraActualIndex];
-            let htmlBloques = `<span style="font-size: 1.1rem; font-weight: bold; color: var(--color-pro); margin-bottom: 10px;">Hilera ${hileraData.fila} de ${totalHilerasDatos.length}</span><div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; align-items: center; margin-top: 8px;">`;
-            
-            hileraData.bloques.forEach(b => {
-                htmlBloques += `<span style="font-size: 1rem; background: #3a2e28; padding: 4px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
-                    ${b.cantidad} <span class="color-muestra" style="width: 18px; height: 18px; background-color: ${b.color};"></span>
-                </span>`;
-            });
-            htmlBloques += `</div>`;
-            contenedorVivo.innerHTML = htmlBloques;
-        }
+function actualizarVistaTejerEnVivo() {
+    const contenedorVivo = document.getElementById('vivoContenedorHilera');
+    if (!contenedorVivo) return;
+
+    let hileraData = totalHilerasDatos[hileraActualIndex];
+    let htmlBloques = `<span style="font-size: 1.1rem; font-weight: bold; color: var(--color-pro); margin-bottom: 10px;">Hilera ${hileraData.fila} de ${totalHilerasDatos.length}</span><div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; align-items: center; margin-top: 8px;">`;
+    
+    hileraData.bloques.forEach(b => {
+        htmlBloques += `<span style="font-size: 1rem; background: #3a2e28; padding: 4px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+            ${b.cantidad} <span class="color-muestra" style="width: 18px; height: 18px; background-color: ${b.color};"></span>
+        </span>`;
+    });
+    htmlBloques += `</div>`;
+    contenedorVivo.innerHTML = htmlBloques;
+}
 
         function cambiarHileraVivo(direccion) {
             hileraActualIndex += direccion;
