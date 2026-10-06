@@ -1886,6 +1886,40 @@ function marcarYAvanzarVivo() {
                 contenedor.appendChild(div);
             });
         }
+        function cargarControlSuscriptores() {
+    const contenedor = document.getElementById('tablaSuscriptoresAdmin');
+    if (!contenedor) return;
+    
+    contenedor.innerHTML = '';
+
+    // Lista simulada o conectada a tus registros de usuarios (con el valor de $12.500)
+    const suscriptores = [
+        { usuario: "maria1985", plan: "Pro ($12.500)", vencimiento: "05/11/2026" },
+        { usuario: "carlos72", plan: "Gratuito", vencimiento: "-" }
+    ];
+
+    suscriptores.forEach(sub => {
+        const fila = `
+            <tr style="border-bottom: 1px solid #221a15;">
+                <td style="padding: 4px;">${sub.usuario}</td>
+                <td style="padding: 4px; color: ${sub.plan.includes('Pro') ? 'var(--color-pro)' : '#aaa'};">${sub.plan}</td>
+                <td style="padding: 4px;">${sub.vencimiento}</td>
+            </tr>
+        `;
+        contenedor.innerHTML += fila;
+    });
+        }
+        function verificarAdmin() {
+    // ... tu código actual de validación de administrador ...
+    
+    // Si la contraseña y usuario son correctos:
+    document.getElementById('areaLoginAdmin').classList.add('hidden');
+    document.getElementById('areaPanelAdmin').classList.remove('hidden');
+    
+    // Llamamos a la función para que dibuje la tabla de suscriptores
+    cargarControlSuscriptores();
+        }
+        
     </script>
 </body>
 </html>
