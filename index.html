@@ -867,20 +867,28 @@
             document.getElementById('canvasPatron').style.transform = `scale(1)`;
         }
 
-        function filtrarBiblioteca(tecnica, botonPresionado) {
+    // Clave de administrador (podés cambiarla por la que prefieras)
+const CLAVE_ADMIN = "admin123"; 
+let esAdministrador = false;
+
+function filtrarBiblioteca(tecnica, botonPresionado) {
     // 1. Quitar la clase 'active' de todos los botones y ponérsela al presionado
     document.querySelectorAll('.biblio-btn').forEach(b => b.classList.remove('active'));
     if (botonPresionado) {
         botonPresionado.classList.add('active');
     }
 
-    // 2. Contenidos detallados para cada técnica
+    // 2. Contenidos detallados para cada técnica incluyendo Macramé con su panel admin
     const contenidos = {
         crochet: `
             <div style="background: #2e241e; border: 1px solid var(--color-tierra); border-radius: 8px; padding: 18px; margin-top: 15px; color: var(--color-arena);">
-                <h3 style="color: var(--color-terracota); margin-bottom: 12px; font-size: 1.2rem;">🧶 Crochet</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 style="color: var(--color-terracota); margin: 0; font-size: 1.2rem;">🧶 Crochet</h3>
+                    ${esAdministrador ? `<button onclick="activarModoEditor('crochet')" style="background: var(--color-terracota); color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">✏️ Administrar Punto</button>` : `<button onclick="pedirClaveAdmin()" style="background: transparent; border: 1px solid var(--color-tierra); color: var(--color-arena); padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">🔒 Modo Admin</button>`}
+                </div>
                 <p style="font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5;">El crochet se trabaja con una aguja de gancho. Los puntos se construyen mediante lazadas y se representan en los diagramas mediante símbolos gráficos.</p>
-                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
+                
+                <div id="contenedorPuntos-crochet" style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
                     <div style="background: #221a15; padding: 10px; border-radius: 6px;">
                         <strong>🔹 Cadena:</strong> Símbolo <code>"○"</code>. Base de muchos trabajos. <br><small style="color:var(--color-arena); opacity:0.8;">Secuencia: "○—○—○—○—○"</small>
                     </div>
@@ -891,7 +899,7 @@
                         <strong>🔹 Media vareta:</strong> Símbolo <code>"T̶"</code>. Punto de altura media.
                     </div>
                     <div style="background: #221a15; padding: 10px; border-radius: 6px;">
-                        <strong>🔹 Vareta simple:</strong> Símbolo <code>"T̶"</code>. Punto más alto y flexible.
+                        <strong>🔹 Vareta simple:</strong> Símbolo <code>"T"</code>. Punto más alto y flexible.
                     </div>
                     <div style="background: #221a15; padding: 10px; border-radius: 6px;">
                         <strong>🔹 Vareta triple:</strong> Símbolo <code>"T̶̶̶"</code>. Punto alto, abierto y decorativo.
@@ -900,13 +908,24 @@
                         <strong>🔹 Punto elástico:</strong> Puntos en relieve para puños y cinturillas.
                     </div>
                 </div>
+
+                <div id="panelAdmin-crochet" style="display: ${esAdministrador ? 'block' : 'none'}; margin-top: 15px; background: #221a15; padding: 12px; border-radius: 6px; border: 1px dashed var(--color-terracota);">
+                    <h4 style="color: var(--color-terracota); margin-bottom: 8px; font-size: 0.95rem;">Agregar Nuevo Punto en Crochet</h4>
+                    <input type="text" id="nombrePunto-crochet" placeholder="Nombre del punto..." style="width: 100%; padding: 6px; margin-bottom: 8px; background: #2e241e; border: 1px solid var(--color-tierra); color: #fff; border-radius: 4px;">
+                    <textarea id="descPunto-crochet" placeholder="Explicación detallada..." style="width: 100%; height: 60px; padding: 6px; margin-bottom: 8px; background: #2e241e; border: 1px solid var(--color-tierra); color: #fff; border-radius: 4px;"></textarea>
+                    <button onclick="guardarNuevoPunto('crochet')" style="background: var(--color-terracota); color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Guardar Punto</button>
+                </div>
             </div>
         `,
         tricot: `
             <div style="background: #2e241e; border: 1px solid var(--color-tierra); border-radius: 8px; padding: 18px; margin-top: 15px; color: var(--color-arena);">
-                <h3 style="color: var(--color-terracota); margin-bottom: 12px; font-size: 1.2rem;">🧣 Tricot (Dos Agujas)</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 style="color: var(--color-terracota); margin: 0; font-size: 1.2rem;">🧣 Tricot (Dos Agujas)</h3>
+                    ${esAdministrador ? `<button onclick="activarModoEditor('tricot')" style="background: var(--color-terracota); color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">✏️ Administrar Punto</button>` : `<button onclick="pedirClaveAdmin()" style="background: transparent; border: 1px solid var(--color-tierra); color: var(--color-arena); padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">🔒 Modo Admin</button>`}
+                </div>
                 <p style="font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5;">Se trabaja con dos agujas combinando puntos al derecho y al revés.</p>
-                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
+                
+                <div id="contenedorPuntos-tricot" style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
                     <div style="background: #221a15; padding: 10px; border-radius: 6px;">
                         <strong>🔹 Montado de puntos:</strong> Procedimiento inicial para fijar la base del trabajo.
                     </div>
@@ -917,43 +936,141 @@
                         <strong>🔹 Punto Santa Clara:</strong> Todas las vueltas al derecho. Ondas horizontales.
                     </div>
                     <div style="background: #221a15; padding: 10px; border-radius: 6px;">
-                        <strong>🔹 Elástico simple y doble:</strong> Canales verticales flexibles (1d/1r o 2d/2r).
+                        <strong>🔹 Elástico simple:</strong> Canales verticales flexibles alternando 1 derecho y 1 revés (1d/1r).
+                    </div>
+                    <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                        <strong>🔹 Elástico doble:</strong> Canales verticales más amplios alternando 2 derechos y 2 revés (2d/2r).
+                    </div>
+                    <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                        <strong>🔹 Arroz simple:</strong> Textura granulada que alterna 1 derecho y 1 revés, invirtiéndose en la hilera siguiente.
+                    </div>
+                    <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                        <strong>🔹 Arroz doble:</strong> Textura granulada más gruesa que alterna bloques de 2 y 2, invirtiéndose cada dos hileras.
+                    </div>
                 </div>
+
+                <div id="panelAdmin-tricot" style="display: ${esAdministrador ? 'block' : 'none'}; margin-top: 15px; background: #221a15; padding: 12px; border-radius: 6px; border: 1px dashed var(--color-terracota);">
+                    <h4 style="color: var(--color-terracota); margin-bottom: 8px; font-size: 0.95rem;">Agregar Nuevo Punto en Tricot</h4>
+                    <input type="text" id="nombrePunto-tricot" placeholder="Nombre del punto..." style="width: 100%; padding: 6px; margin-bottom: 8px; background: #2e241e; border: 1px solid var(--color-tierra); color: #fff; border-radius: 4px;">
+                    <textarea id="descPunto-tricot" placeholder="Explicación detallada..." style="width: 100%; height: 60px; padding: 6px; margin-bottom: 8px; background: #2e241e; border: 1px solid var(--color-tierra); color: #fff; border-radius: 4px;"></textarea>
+                    <button onclick="guardarNuevoPunto('tricot')" style="background: var(--color-terracota); color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Guardar Punto</button>
+                </div>
+            </div>
         `,
         telar: `
             <div style="background: #2e241e; border: 1px solid var(--color-tierra); border-radius: 8px; padding: 18px; margin-top: 15px; color: var(--color-arena);">
-                <h3 style="color: var(--color-terracota); margin-bottom: 12px; font-size: 1.2rem;">🪡 Telar y Diseños</h3>
-                <p style="font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5;">Utiliza urdimbre (longitudinal) y trama (transversal).</p>
-                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 style="color: var(--color-terracota); margin: 0; font-size: 1.2rem;">🪡 Telar y Otros Telares</h3>
+                    ${esAdministrador ? `<button onclick="activarModoEditor('telar')" style="background: var(--color-terracota); color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">✏️ Administrar Telar</button>` : `<button onclick="pedirClaveAdmin()" style="background: transparent; border: 1px solid var(--color-tierra); color: var(--color-arena); padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">🔒 Modo Admin</button>`}
+                </div>
+                <p style="font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5;">Utiliza urdimbre (longitudinal) y trama (transversal), adaptándose a distintos tipos de telares tradicionales y modernos.</p>
+                
+                <div id="contenedorPuntos-telar" style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
                     <div style="background: #221a15; padding: 10px; border-radius: 6px;">
-                        <strong>🔹 Tafetán:</strong> Estructura básica 1 arriba y 1 abajo.
+                        <strong>🔹 Tafetán (Telar María / Vertical):</strong> Estructura básica 1 arriba y 1 abajo.
                     </div>
                     <div style="background: #221a15; padding: 10px; border-radius: 6px;">
-                        <strong>🔹 Sarga:</strong> Cruces desplazados que forman líneas diagonales.
+                        <strong>🔹 Sarga:</strong> Cruces desplazados que forman líneas diagonales características.
+                    </div>
+                    <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                        <strong>🔹 Telar de Peine Corte / Rígido:</strong> Diseñado para urdidos directos y producción ágil de piezas planas.
+                    </div>
+                    <div style="background: #221a15; padding: 10px; border-radius: 6px;">
+                        <strong>🔹 Telar Mapuche / Witral:</strong> Telar vertical tradicional de tensión manual para aguayos y fajas andinas.
                     </div>
                     <div style="background: #221a15; padding: 10px; border-radius: 6px;">
                         <strong>🎨 Diseños tradicionales:</strong> Pie de pool, Cuadrillé, Escocés y Barracán.
                     </div>
                 </div>
+
+                <div id="panelAdmin-telar" style="display: ${esAdministrador ? 'block' : 'none'}; margin-top: 15px; background: #221a15; padding: 12px; border-radius: 6px; border: 1px dashed var(--color-terracota);">
+                    <h4 style="color: var(--color-terracota); margin-bottom: 8px; font-size: 0.95rem;">Agregar Nuevo Telar o Estructura</h4>
+                    <input type="text" id="nombrePunto-telar" placeholder="Nombre del telar / técnica..." style="width: 100%; padding: 6px; margin-bottom: 8px; background: #2e241e; border: 1px solid var(--color-tierra); color: #fff; border-radius: 4px;">
+                    <textarea id="descPunto-telar" placeholder="Descripción y funcionamiento..." style="width: 100%; height: 60px; padding: 6px; margin-bottom: 8px; background: #2e241e; border: 1px solid var(--color-tierra); color: #fff; border-radius: 4px;"></textarea>
+                    <button onclick="guardarNuevoPunto('telar')" style="background: var(--color-terracota); color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Guardar Telar</button>
+                </div>
             </div>
         `,
         macrame: `
             <div style="background: #2e241e; border: 1px solid var(--color-tierra); border-radius: 8px; padding: 18px; margin-top: 15px; color: var(--color-arena);">
-                <h3 style="color: var(--color-terracota); margin-bottom: 12px; font-size: 1.2rem;">🪢 Macramé</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 style="color: var(--color-terracota); margin: 0; font-size: 1.2rem;">🪢 Macramé</h3>
+                    ${esAdministrador ? `<button onclick="activarModoEditor('macrame')" style="background: var(--color-terracota); color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">✏️ Administrar Nudo</button>` : `<button onclick="pedirClaveAdmin()" style="background: transparent; border: 1px solid var(--color-tierra); color: var(--color-arena); padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">🔒 Modo Admin</button>`}
+                </div>
                 <p style="font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5;">Técnica de nudos manuales con cordones o hilos.</p>
-                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
+                
+                <div id="contenedorPuntos-macrame" style="display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem;">
                     <div style="background: #221a15; padding: 10px; border-radius: 6px;">
                         <strong>🔹 Nudo plano:</strong> Utiliza cordones centrales y laterales que se cruzan alternando el sentido para superficies estables.
                     </div>
+                </div>
+
+                <div id="panelAdmin-macrame" style="display: ${esAdministrador ? 'block' : 'none'}; margin-top: 15px; background: #221a15; padding: 12px; border-radius: 6px; border: 1px dashed var(--color-terracota);">
+                    <h4 style="color: var(--color-terracota); margin-bottom: 8px; font-size: 0.95rem;">Agregar Nuevo Nudo en Macramé</h4>
+                    <input type="text" id="nombrePunto-macrame" placeholder="Nombre del nudo..." style="width: 100%; padding: 6px; margin-bottom: 8px; background: #2e241e; border: 1px solid var(--color-tierra); color: #fff; border-radius: 4px;">
+                    <textarea id="descPunto-macrame" placeholder="Explicación detallada..." style="width: 100%; height: 60px; padding: 6px; margin-bottom: 8px; background: #2e241e; border: 1px solid var(--color-tierra); color: #fff; border-radius: 4px;"></textarea>
+                    <button onclick="guardarNuevoPunto('macrame')" style="background: var(--color-terracota); color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Guardar Nudo</button>
                 </div>
             </div>
         `
     };
 
-    // 3. Inyectar el contenido en el contenedor dinámico del HTML
+    // 3. Inyectar el contenido activo actual
     const contenedor = document.getElementById('contenedorBibliotecaDinamica');
     if (contenedor) {
-        contenedor.innerHTML = contenidos[tecnica] || '';
+        // Obtenemos qué botón está activo actualmente para refrescar la vista si cambia el estado de admin
+        const botonActivo = document.querySelector('.biblio-btn.active');
+        const tecnicaActual = botonActivo ? botonActivo.getAttribute('onclick').match(/'([^']+)'/)[1] : tecnica;
+        contenedor.innerHTML = contenidos[tecnicaActual] || '';
+    }
+}
+
+// Función para solicitar la contraseña de administrador
+function pedirClaveAdmin() {
+    const claveIngresada = prompt("Ingresá la contraseña de administrador:");
+    if (claveIngresada === CLAVE_ADMIN) {
+        esAdministrador = true;
+        alert("¡Acceso de administrador concedido!");
+        // Refrescamos la biblioteca actual para mostrar los paneles
+        const botonActivo = document.querySelector('.biblio-btn.active');
+        if (botonActivo) {
+            botonActivo.click();
+        } else {
+            filtrarBiblioteca('crochet');
+        }
+    } else if (claveIngresada !== null) {
+        alert("Contraseña incorrecta.");
+    }
+}
+
+// Funciones de administración
+function activarModoEditor(tecnica) {
+    const panel = document.getElementById(`panelAdmin-${tecnica}`);
+    if (panel) {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function guardarNuevoPunto(tecnica) {
+    const nombre = document.getElementById(`nombrePunto-${tecnica}`).value;
+    const desc = document.getElementById(`descPunto-${tecnica}`).value;
+    
+    if(!nombre || !desc) {
+        alert("Completá ambos campos para guardar.");
+        return;
+    }
+
+    const contenedorPuntos = document.getElementById(`contenedorPuntos-${tecnica}`);
+    if(contenedorPuntos) {
+        const nuevoDiv = document.createElement('div');
+        nuevoDiv.style.cssText = "background: #221a15; padding: 10px; border-radius: 6px; border-left: 3px solid var(--color-terracota);";
+        nuevoDiv.innerHTML = `<strong>🔹 ${nombre}:</strong> ${desc}`;
+        contenedorPuntos.appendChild(nuevoDiv);
+        
+        // Limpiar campos y ocultar panel
+        document.getElementById(`nombrePunto-${tecnica}`).value = '';
+        document.getElementById(`descPunto-${tecnica}`).value = '';
+        document.getElementById(`panelAdmin-${tecnica}`).style.display = 'none';
     }
 }
 
