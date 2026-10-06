@@ -777,7 +777,7 @@
     
     let codigoIngresado = inputElem.value.trim();
     
-    // 1. Valida exactamente el formato (Creativo - meses - caracteres)
+    // 1. Valida el formato básico
     let regexValidador = /^creativo-(\d+)-[a-zA-Z0-9]{10,15}$/i;
     let coincidencia = codigoIngresado.match(regexValidador);
 
@@ -789,21 +789,25 @@
     let meses = parseInt(coincidencia[1]);
     let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
     
-    // 2. Control de un solo uso contra tu base de códigos generados
+    // 2. Buscar si el código realmente fue generado en el panel de administrador
     let index = listaCodigos.findIndex(c => c.codigo.toLowerCase() === codigoIngresado.toLowerCase());
 
-    if (index !== -1) {
-        if (listaCodigos[index].utilizado) {
-            alert('❌ Este código ya fue utilizado anteriormente y no puede volver a usarse.');
-            return;
-        }
-        // Lo marcamos como utilizado en la base del panel
-        listaCodigos[index].utilizado = true;
-        listaCodigos[index].fechaUso = new Date().toLocaleDateString();
-        localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
+    if (index === -1) {
+        alert('❌ Este código no existe o no fue generado por el administrador.');
+        return;
     }
 
-    // 3. Calcula los días (30 días por mes) y activa la versión Pro
+    if (listaCodigos[index].utilizado) {
+        alert('❌ Este código ya fue utilizado anteriormente y no puede volver a usarse.');
+        return;
+    }
+
+    // 3. Marcarlo como utilizado en la base de datos del panel
+    listaCodigos[index].utilizado = true;
+    listaCodigos[index].fechaUso = new Date().toLocaleDateString();
+    localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
+
+    // 4. Calcular los días y activar la versión Pro en el cliente
     let duracionMs = meses * 30 * 24 * 60 * 60 * 1000;
     let expiraTiempo = new Date().getTime() + duracionMs;
     
@@ -813,10 +817,12 @@
     if (typeof verificarEstadoPro === 'function') verificarEstadoPro();
     alert(`¡Felicitaciones! Versión Pro activada por ${meses} mes(es) (${meses * 30} días) con éxito.`);
     
+    // Actualiza la lista en el panel si está abierto
     if (typeof renderizarListaCodigosAdmin === 'function') {
         renderizarListaCodigosAdmin();
     }
 }
+
 
         function intentarAbrirAdmin() {
             contadorClicksHeader++;
