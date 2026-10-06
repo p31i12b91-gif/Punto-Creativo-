@@ -1579,7 +1579,22 @@ function obtenerNombreColor(colorRgbStr) {
 // 4. Lector de voz exclusivo PRO para la hilera actual en vivo
 function leerHileraVozActual() {
     const esPro = esUsuarioPro() || esAdminApp();
-    if (!esPro) { alert('🔒 Lectura de voz exclusiva de la Versión Pro.'); return; }
+    
+    // 📌 Si NO es Pro ni Admin, bloqueamos, avisamos y los mandamos al perfil
+    if (!esPro) {
+        let mensaje = "⚠️ ¡La función de Lectura por Voz en Vivo es exclusiva de la Versión Pro!\n\n";
+        mensaje += "¿Querés ir a la sección de Perfil y Suscripción para activar la Versión Pro y desbloquear el asistente de voz?";
+
+        if (confirm(mensaje)) {
+            const seccionPerfil = document.getElementById('seccion-perfil');
+            if (seccionPerfil) {
+                seccionPerfil.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        return; 
+    }
+
+    // 🔊 Código original de lectura de voz para usuarios Pro / Admin
     if ('speechSynthesis' in window && totalHilerasDatos.length > 0) {
         window.speechSynthesis.cancel();
         let hileraData = totalHilerasDatos[hileraActualIndex];
