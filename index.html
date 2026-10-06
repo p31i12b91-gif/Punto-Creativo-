@@ -473,73 +473,76 @@
     <main>
         <!-- 1. NUEVO PROYECTO -->
         <section id="seccion-nuevo" class="section-view active-section card">
-            <h2>Configurar Proyecto <span id="etiquetaPlanActual" style="font-size:0.75rem; background:#444; padding:2px 6px; border-radius:4px;">Versión Gratuita</span></h2>
+    <h2>Configurar Proyecto <span id="etiquetaPlanActual" style="font-size:0.75rem; background:#444; padding:2px 6px; border-radius:4px;">Versión Gratuita</span></h2>
+    
+    <div class="form-group">
+        <label for="nombreProj">Nombre del Proyecto:</label>
+        <input type="text" id="nombreProj" placeholder="Ej: Guardas Andinas">
+    </div>
+
+    <div class="form-group">
+        <label for="imagenInput">Subir imagen desde la galería:</label>
+        <input type="file" id="imagenInput" accept="image/*">
+    </div>
+
+    <div class="form-group">
+        <label for="tecnicaSelect">Técnica de tejido:</label>
+        <select id="tecnicaSelect">
+            <option value="tapestry">Tapestry</option>
+            <option value="jacquard">Jacquard</option>
+        </select>
+    </div>
+
+    <div class="grid-inputs">
+        <div class="form-group">
+            <label for="anchoPuntos">Ancho (Máx <span id="limiteAnchoTxt">40</span>):</label>
+            <input type="number" id="anchoPuntos" min="10" max="2000" value="20">
+        </div>
+        <div class="form-group">
+            <label for="altoPuntos">Alto (Máx <span id="limiteAltoTxt">40</span>):</label>
+            <input type="number" id="altoPuntos" min="10" max="2000" value="20">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="cantColores">Cantidad de Colores (Máx <span id="limiteColorTxt">6</span>):</label>
+        <input type="number" id="cantColores" min="2" max="25" value="4">
+    </div>
+
+    <button class="btn-primary" id="btnGenerar">Generar y Pixelar Patrón</button>
+
+    <div id="area-resultado" class="hidden" style="margin-top: 15px;">
+        <hr style="border-color: var(--color-tierra); margin: 15px 0;">
+        <h2>Patrón Generado & Lectura</h2>
+        
+        <div class="preview-wrapper">
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="ajustarZoom(0.2)">🔍 + Zoom</button>
+                <button class="zoom-btn" onclick="ajustarZoom(-0.2)">🔍 - Zoom</button>
+                <button class="zoom-btn" onclick="resetZoom()">1:1</button>
+            </div>
+            <div class="preview-container" id="contenedorCanvasScroll">
+                <canvas id="canvasPatron"></canvas>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Paso a paso por hilera (Tocá para marcar completada):</label>
+            <div class="hilera-list" id="listaHileras"></div>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <button class="btn-primary" onclick="abrirTejerEnVivo()" style="background-color: var(--color-cardon); width: 100%; margin-bottom: 10px;">🧶 Iniciar Tejer en Vivo (Paso a Paso)</button>
             
-            <div class="form-group">
-                <label for="nombreProj">Nombre del Proyecto:</label>
-                <input type="text" id="nombreProj" placeholder="Ej: Guardas Andinas">
-            </div>
+            <button class="btn-secondary" onclick="reiniciarProgreso()" style="background-color: var(--color-terracota); width: 100%; margin-bottom: 10px;">🔄 Reiniciar Progreso</button>
+            
+            <button class="btn-secondary" onclick="guardarProyecto()" style="background-color: var(--color-tierra); width: 100%; margin-bottom: 10px;">💾 Guardar Proyecto</button>
+            
+            <button id="btnPdfPro" class="btn-secondary" onclick="imprimirPdfPro()" style="background-color: #8e44ad; width: 100%;">📄 Descargar / Imprimir PDF <span class="badge-pro">PRO</span></button>
+        </div>
+    </div>
+</section>
 
-            <div class="form-group">
-                <label for="imagenInput">Subir imagen desde la galería:</label>
-                <input type="file" id="imagenInput" accept="image/*">
-            </div>
-
-            <div class="form-group">
-                <label for="tecnicaSelect">Técnica de tejido:</label>
-                <select id="tecnicaSelect">
-                    <option value="tapestry">Tapestry</option>
-                    <option value="jacquard">Jacquard</option>
-                </select>
-            </div>
-
-            <div class="grid-inputs">
-                <div class="form-group">
-                    <label for="anchoPuntos">Ancho (Máx <span id="limiteAnchoTxt">40</span>):</label>
-                    <input type="number" id="anchoPuntos" min="10" max="2000" value="20">
-                </div>
-                <div class="form-group">
-                    <label for="altoPuntos">Alto (Máx <span id="limiteAltoTxt">40</span>):</label>
-                    <input type="number" id="altoPuntos" min="10" max="2000" value="20">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="cantColores">Cantidad de Colores (Máx <span id="limiteColorTxt">6</span>):</label>
-                <input type="number" id="cantColores" min="2" max="25" value="4">
-            </div>
-
-            <button class="btn-primary" id="btnGenerar">Generar y Pixelar Patrón</button>
-
-            <div id="area-resultado" class="hidden" style="margin-top: 15px;">
-                <hr style="border-color: var(--color-tierra); margin: 15px 0;">
-                <h2>Patrón Generado & Lectura</h2>
-                
-                <div class="preview-wrapper">
-                    <div class="zoom-controls">
-                        <button class="zoom-btn" onclick="ajustarZoom(0.2)">🔍 + Zoom</button>
-                        <button class="zoom-btn" onclick="ajustarZoom(-0.2)">🔍 - Zoom</button>
-                        <button class="zoom-btn" onclick="resetZoom()">1:1</button>
-                    </div>
-                    <div class="preview-container" id="contenedorCanvasScroll">
-                        <canvas id="canvasPatron"></canvas>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Paso a paso por hilera (Tocá para marcar completada):</label>
-                    <div class="hilera-list" id="listaHileras"></div>
-                </div>
-
-                <div class="audio-controls">
-                    <button id="btnVozPro" onclick="leerHileraVoz()">🔊 Leer Hilera <span class="badge-pro">PRO</span></button>
-                    <button onclick="reiniciarProgreso()" style="background-color: var(--color-terracota);">🔄 Reiniciar</button>
-                </div>
-                <button class="btn-primary" onclick="abrirTejerEnVivo()" style="background-color: var(--color-cardon); margin-top: 8px;">🧶 Iniciar Tejer en Vivo (Paso a Paso)</button>
-                <button class="btn-secondary" onclick="guardarProyecto()" style="background-color: var(--color-cardon); margin-top: 10px;">💾 Guardar Proyecto</button>
-                <button id="btnPdfPro" class="btn-secondary" onclick="imprimirPdfPro()" style="background-color: var(--color-tierra);">📄 Descargar / Imprimir PDF <span class="badge-pro">PRO</span></button>
-            </div>
-        </section>
 
         <!-- 2. PROYECTOS GUARDADOS -->
         <section id="seccion-proyectos" class="section-view card">
