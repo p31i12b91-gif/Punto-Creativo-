@@ -792,22 +792,24 @@
     // 2. Buscar si el código realmente fue generado en el panel de administrador
     let index = listaCodigos.findIndex(c => c.codigo.toLowerCase() === codigoIngresado.toLowerCase());
 
+    // SI NO EXISTE EN LA BASE DE DATOS, LO BLOQUEA INMEDIATAMENTE
     if (index === -1) {
         alert('❌ Este código no existe o no fue generado por el administrador.');
         return;
     }
 
+    // SI YA FUE USADO, LO BLOQUEA
     if (listaCodigos[index].utilizado) {
         alert('❌ Este código ya fue utilizado anteriormente y no puede volver a usarse.');
         return;
     }
 
-    // 3. Marcarlo como utilizado en la base de datos del panel
+    // 3. Marcarlo como utilizado
     listaCodigos[index].utilizado = true;
     listaCodigos[index].fechaUso = new Date().toLocaleDateString();
     localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
 
-    // 4. Calcular los días y activar la versión Pro en el cliente
+    // 4. Activar la versión Pro
     let duracionMs = meses * 30 * 24 * 60 * 60 * 1000;
     let expiraTiempo = new Date().getTime() + duracionMs;
     
@@ -817,12 +819,10 @@
     if (typeof verificarEstadoPro === 'function') verificarEstadoPro();
     alert(`¡Felicitaciones! Versión Pro activada por ${meses} mes(es) (${meses * 30} días) con éxito.`);
     
-    // Actualiza la lista en el panel si está abierto
     if (typeof renderizarListaCodigosAdmin === 'function') {
         renderizarListaCodigosAdmin();
     }
 }
-
 
         function intentarAbrirAdmin() {
             contadorClicksHeader++;
