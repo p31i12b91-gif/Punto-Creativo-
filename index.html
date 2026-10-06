@@ -840,22 +840,44 @@
         }
 
         function generarNuevoCodigoPro() {
-            let nombre = document.getElementById('adminNombreUser').value.trim().toLowerCase().replace(/\s+/g, '');
-            let anio = document.getElementById('adminAnioUser').value.trim();
-            let meses = parseInt(document.getElementById('adminMesesUser').value) || 1;
+    let nombre = document.getElementById('adminNombreUser').value.trim().replace(/\s+/g, '');
+    let meses = parseInt(document.getElementById('adminMesesUser').value) || 1;
 
-            if (!nombre || !anio) { alert('Completá nombre y año.'); return; }
-            let codigoGenerado = `creativo-${nombre}-${anio}`;
-            let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
-            
-            listaCodigos.push({ codigo: codigoGenerado, meses: meses, creado: new Date().toLocaleDateString(), utilizado: false });
-            localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
+    if (!nombre) { 
+        alert('Completá el nombre del usuario.'); 
+        return; 
+    }
 
-            document.getElementById('adminNombreUser').value = '';
-            document.getElementById('adminAnioUser').value = '';
-            renderizarListaCodigosAdmin();
-            alert(`Código creado:\n${codigoGenerado}`);
-        }
+    // Generador automático de 4 caracteres alfanuméricos aleatorios (ej: A7b9)
+    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let aleatorio = '';
+    for (let i = 0; i < 4; i++) {
+        aleatorio += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    // Estructura final: Creativo - Nombre - 4 dígitos alfanuméricos
+    let codigoGenerado = `Creativo-${nombre}-${aleatorio}`;
+    
+    let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
+    
+    listaCodigos.push({ 
+        codigo: codigoGenerado, 
+        meses: meses, 
+        creado: new Date().toLocaleDateString(), 
+        utilizado: false 
+    });
+    
+    localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
+
+    document.getElementById('adminNombreUser').value = '';
+    // Limpiamos o removemos el input de año si ya no lo usás en el HTML
+    if (document.getElementById('adminAnioUser')) {
+        document.getElementById('adminAnioUser').value = '';
+    }
+    
+    renderizarListaCodigosAdmin();
+    alert(`¡Código creado con éxito!\n${codigoGenerado}`);
+}
 
         function renderizarListaCodigosAdmin() {
             let contenedor = document.getElementById('listaCodigosAdminContenedor');
