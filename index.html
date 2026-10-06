@@ -777,50 +777,24 @@
     
     let codigoIngresado = inputElem.value.trim();
     
-    // Validamos el formato exacto: Creativo - [número de meses] - [10 caracteres alfanuméricos]
-    let regexValidador = /^creativo-(\d+)-([a-zA-Z0-9]{10})$/i;
+    // Valida exactamente que tenga 3 partes: Creativo, el número de meses, y los caracteres seguidos sin más guiones
+    let regexValidador = /^creativo-(\d+)-[a-zA-Z0-9]{10,15}$/i;
     let coincidencia = codigoIngresado.match(regexValidador);
 
     if (coincidencia) {
         let meses = parseInt(coincidencia[1]);
-        let aleatorio = coincidencia[2];
+        let duracionMs = meses * 30 * 24 * 60 * 60 * 1000;
+        let expiraTiempo = new Date().getTime() + duracionMs;
         
-        // Clave secreta (debe ser la misma que pusiste en el generador)
-        let secretoMaster = "PuntoCreativo2026";
-        
-        // Validación matemática de seguridad para verificar que el código es legítimo tuyo
-        // Sumamos los valores y aplicamos una comprobación interna
-        let esValidoTuyo = false;
-        
-        // Creamos una validación basada en las letras del código y tu secreto
-        let sumaCaracteres = 0;
-        for (let i = 0; i < aleatorio.length; i++) {
-            sumaCaracteres += aleatorio.charCodeAt(i);
-        }
-        
-        // Todos los códigos generados por tu algoritmo matemático tienen una propiedad única de control
-        // O más simple y seguro: podemos verificar que cumpla con el patrón de tu generador aleatorio seguro.
-        // Como los 10 dígitos fueron generados por tu función, aplicamos la regla de aceptación:
-        if (meses >= 1 && meses <= 12 && aleatorio.length === 10) {
-            esValidoTuyo = true; // Valida de forma remota y segura en cualquier dispositivo
-        }
+        localStorage.setItem('punto_creativo_pro', JSON.stringify({ expira: expiraTiempo }));
 
-        if (esValidoTuyo) {
-            let duracionMs = meses * 30 * 24 * 60 * 60 * 1000;
-            let expiraTiempo = new Date().getTime() + duracionMs;
-            
-            localStorage.setItem('punto_creativo_pro', JSON.stringify({ expira: expiraTiempo }));
-
-            inputElem.value = '';
-            if (typeof verificarEstadoPro === 'function') verificarEstadoPro();
-            alert(`¡Felicitaciones! Versión Pro activada por ${meses} mes(es) con éxito.`);
-            return;
-        }
+        inputElem.value = '';
+        if (typeof verificarEstadoPro === 'function') verificarEstadoPro();
+        alert(`¡Felicitaciones! Versión Pro activada por ${meses} mes(es) con éxito.`);
+    } else {
+        alert('Código inválido o falso.');
     }
-    
-    alert('Código inválido o falso.');
 }
-
 
 
         function intentarAbrirAdmin() {
@@ -869,20 +843,16 @@
                         function generarNuevoCodigoPro() {
     let meses = parseInt(document.getElementById('adminMesesUser').value) || 1;
 
-    // Tu clave secreta personal (nadie más la conoce)
-    let secretoMaster = "PuntoCreativo2026"; 
-
-    // Caracteres permitidos para los 10 dígitos alfanuméricos
     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let aleatorio = '';
-    for (let i = 0; i < 10; i++) {
+    // Generamos 12 caracteres continuos sin guiones para mayor seguridad
+    for (let i = 0; i < 12; i++) {
         aleatorio += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
-    // Estructura limpia que vos querías: Creativo - [meses] - [10 dígitos]
+    // Estructura limpia de 3 partes exactas: Creativo - [meses] - [12 caracteres]
     let codigoGenerado = `Creativo-${meses}-${aleatorio}`;
     
-    // Guardamos el código junto con una marca de su firma secreta en tu base local
     let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
     listaCodigos.push({ 
         codigo: codigoGenerado, 
@@ -896,8 +866,6 @@
     renderizarListaCodigosAdmin();
     alert(`¡Código creado con éxito!\n${codigoGenerado}`);
 }
-
-
 
         function renderizarListaCodigosAdmin() {
             let contenedor = document.getElementById('listaCodigosAdminContenedor');
