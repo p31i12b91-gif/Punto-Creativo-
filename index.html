@@ -772,30 +772,32 @@
         }
 
                 function activarCodigoPro() {
-            // Obtenemos el código ingresado pero pasamos AMBOS lados a minúsculas para comparar sin errores de mayúsculas
-            let codigoIngresado = document.getElementById('inputCodigoPro').value.trim().toLowerCase();
-            let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
-            
-            // Buscamos comparando en minúsculas para que no importe cómo se tipeó
-            let index = listaCodigos.findIndex(c => c.codigo.toLowerCase() === codigoIngresado && !c.utilizado);
+    let inputElem = document.getElementById('inputCodigoPro');
+    if (!inputElem) return;
+    
+    let codigoIngresado = inputElem.value.trim().toLowerCase();
+    let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
+    
+    // Comparamos convirtiendo ambos a minúsculas para evitar problemas de mayúsculas/minúsculas
+    let index = listaCodigos.findIndex(c => c.codigo && c.codigo.toLowerCase() === codigoIngresado && !c.utilizado);
 
-            if (index !== -1) {
-                let item = listaCodigos[index];
-                let duracionMs = item.meses * 30 * 24 * 60 * 60 * 1000;
-                let expiraTiempo = new Date().getTime() + duracionMs;
-                
-                localStorage.setItem('punto_creativo_pro', JSON.stringify({ expira: expiraTiempo }));
-                item.utilizado = true;
-                item.fechaUso = new Date().toLocaleDateString();
-                localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
+    if (index !== -1) {
+        let item = listaCodigos[index];
+        let duracionMs = item.meses * 30 * 24 * 60 * 60 * 1000;
+        let expiraTiempo = new Date().getTime() + duracionMs;
+        
+        localStorage.setItem('punto_creativo_pro', JSON.stringify({ expira: expiraTiempo }));
+        item.utilizado = true;
+        item.fechaUso = new Date().toLocaleDateString();
+        localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
 
-                document.getElementById('inputCodigoPro').value = '';
-                verificarEstadoPro();
-                alert(`¡Felicitaciones! Versión Pro activada por ${item.meses} mes(es) con éxito.`);
-            } else {
-                alert('Código inválido o ya utilizado.');
-            }
-        }
+        inputElem.value = '';
+        if (typeof verificarEstadoPro === 'function') verificarEstadoPro();
+        alert(`¡Felicitaciones! Versión Pro activada por ${item.meses} mes(es) con éxito.`);
+    } else {
+        alert('Código inválido o ya utilizado.');
+    }
+}
 
 
         function intentarAbrirAdmin() {
