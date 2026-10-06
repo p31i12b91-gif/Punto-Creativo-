@@ -676,6 +676,25 @@
                     <div id="listaCodigosAdminContenedor" style="max-height: 140px; overflow-y: auto; background: #221a15; padding: 6px; border-radius: 4px; margin-top: 4px;"></div>
                 </div>
 
+                <!-- BLOQUE NUEVO: Control de Suscriptores Pro ($12.500/mes) -->
+                <div style="background: #18120e; padding: 10px; border-radius: 6px; margin-bottom: 14px; border: 1px solid var(--color-pro);">
+                    <label style="color: var(--color-pro); font-weight: bold; margin-bottom: 6px;">👥 Control de Suscriptores ($12.500/mes):</label>
+                    <div style="max-height: 150px; overflow-y: auto; margin-top: 8px;">
+                        <table style="width: 100%; font-size: 0.75rem; color: #d8c29d; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--color-tierra); text-align: left;">
+                                    <th style="padding: 4px;">Usuario</th>
+                                    <th style="padding: 4px;">Plan</th>
+                                    <th style="padding: 4px;">Vencimiento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaSuscriptoresAdmin">
+                                <!-- Las filas se cargarán automáticamente aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <button class="btn-secondary" onclick="cerrarAdmin()" style="background-color: #c0392b;">Cerrar Sesión Administrador</button>
             </div>
         </div>
@@ -684,6 +703,7 @@
     <a href="https://wa.me/5493884098349?text=Hola%20Iván,%20te%20envío%20el%20comprobante%20de%20pago%20para%20la%20versión%20Pro%20de%20Punto%20Creativo." class="whatsapp-float" target="_blank" title="Contactar por WhatsApp">
         💬
     </a>
+
 
     <script>
         let totalHilerasDatos = [];
