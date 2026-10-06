@@ -659,22 +659,20 @@
                 </div>
 
                 <div style="background: #18120e; padding: 10px; border-radius: 6px; margin-bottom: 14px; border: 1px solid var(--color-pro);">
-                    <label style="color: var(--color-pro); font-weight: bold; margin-bottom: 6px;">🎫 Generador de Códigos Pro:</label>
-                    <div class="form-group" style="margin-top: 6px;">
-                        <input type="text" id="adminNombreUser" placeholder="Nombre usuario (ej: maria)">
-                    </div>
-                    <div class="form-group">
-                        <input type="number" id="adminAnioUser" placeholder="Año nacimiento (ej: 1985)">
-                    </div>
-                    <div class="form-group">
-                        <label for="adminMesesUser" style="color: #d8c29d; font-size: 0.75rem;">Meses pagados:</label>
-                        <input type="number" id="adminMesesUser" min="1" max="12" value="1">
-                    </div>
-                    <button class="btn-secondary" style="background-color: var(--color-pro); color:#221a15; font-weight:bold;" onclick="generarNuevoCodigoPro()">Crear Código Pro</button>
-                    
-                    <p style="font-size: 0.75rem; color: #d8c29d; margin-top: 8px;">Códigos generados:</p>
-                    <div id="listaCodigosAdminContenedor" style="max-height: 140px; overflow-y: auto; background: #221a15; padding: 6px; border-radius: 4px; margin-top: 4px;"></div>
-                </div>
+    <label style="color: var(--color-pro); font-weight: bold; margin-bottom: 6px;">🎫 Generador de Códigos Pro:</label>
+    <div class="form-group" style="margin-top: 6px;">
+        <input type="text" id="adminNombreUser" placeholder="Nombre usuario (ej: maria)">
+    </div>
+    <div class="form-group">
+        <label for="adminMesesUser" style="color: #d8c29d; font-size: 0.75rem;">Meses pagados:</label>
+        <input type="number" id="adminMesesUser" min="1" max="12" value="1">
+    </div>
+    <button class="btn-secondary" style="background-color: var(--color-pro); color:#221a15; font-weight:bold;" onclick="generarNuevoCodigoPro()">Crear Código Pro</button>
+    
+    <p style="font-size: 0.75rem; color: #d8c29d; margin-top: 8px;">Códigos generados:</p>
+    <div id="listaCodigosAdminContenedor" style="max-height: 140px; overflow-y: auto; background: #221a15; padding: 6px; border-radius: 4px; margin-top: 4px;"></div>
+</div>
+
 
                 <!-- BLOQUE NUEVO: Control de Suscriptores Pro ($12.500/mes) -->
                 <div style="background: #18120e; padding: 10px; border-radius: 6px; margin-bottom: 14px; border: 1px solid var(--color-pro);">
