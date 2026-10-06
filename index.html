@@ -841,45 +841,43 @@
             alert('Sesión de administrador cerrada.');
         }
 
-        function generarNuevoCodigoPro() {
-    let nombre = document.getElementById('adminNombreUser').value.trim().replace(/\s+/g, '');
-    let meses = parseInt(document.getElementById('adminMesesUser').value) || 1;
+                function generarNuevoCodigoPro() {
+            let meses = parseInt(document.getElementById('adminMesesUser').value) || 1;
 
-    if (!nombre) { 
-        alert('Completá el nombre del usuario.'); 
-        return; 
-    }
+            // Caracteres permitidos: letras y números del 0 al 9
+            let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let aleatorio = '';
+            
+            // Generador configurado a 10 dígitos alfanuméricos
+            for (let i = 0; i < 10; i++) {
+                aleatorio += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
 
-    // Generador automático de 4 caracteres alfanuméricos aleatorios (ej: A7b9)
-    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let aleatorio = '';
-    for (let i = 0; i < 4; i++) {
-        aleatorio += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+            // Estructura limpia y simplificada: Creativo - 10 dígitos alfanuméricos
+            let codigoGenerado = `Creativo-${aleatorio}`;
+            
+            let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
+            
+            listaCodigos.push({ 
+                codigo: codigoGenerado, 
+                meses: meses, 
+                creado: new Date().toLocaleDateString(), 
+                utilizado: false 
+            });
+            
+            localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
 
-    // Estructura final: Creativo - Nombre - 4 dígitos alfanuméricos
-    let codigoGenerado = `Creativo-${nombre}-${aleatorio}`;
-    
-    let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
-    
-    listaCodigos.push({ 
-        codigo: codigoGenerado, 
-        meses: meses, 
-        creado: new Date().toLocaleDateString(), 
-        utilizado: false 
-    });
-    
-    localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
-
-    document.getElementById('adminNombreUser').value = '';
-    // Limpiamos o removemos el input de año si ya no lo usás en el HTML
-    if (document.getElementById('adminAnioUser')) {
-        document.getElementById('adminAnioUser').value = '';
-    }
-    
-    renderizarListaCodigosAdmin();
-    alert(`¡Código creado con éxito!\n${codigoGenerado}`);
-}
+            // Limpiamos o removemos inputs viejos de forma segura si todavía están en el HTML
+            if (document.getElementById('adminNombreUser')) {
+                document.getElementById('adminNombreUser').value = '';
+            }
+            if (document.getElementById('adminAnioUser')) {
+                document.getElementById('adminAnioUser').value = '';
+            }
+            
+            renderizarListaCodigosAdmin();
+            alert(`¡Código creado con éxito!\n${codigoGenerado}`);
+        }
 
         function renderizarListaCodigosAdmin() {
             let contenedor = document.getElementById('listaCodigosAdminContenedor');
@@ -895,6 +893,7 @@
             });
             contenedor.innerHTML = html;
         }
+
 
         function eliminarCodigoAdmin(codigo) {
             let lista = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
