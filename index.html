@@ -1732,19 +1732,45 @@ function actualizarCanvasTejerVivo() {
 
     const altoPorHilera = canvasVivo.height / totalHileras;
 
-    // 2. Recorremos cada hilera para oscurecer las ya completadas (de abajo hacia arriba)
+    // 2. Recorremos cada hilera
     totalHilerasDatos.forEach((hileraData, index) => {
-        // Ignoramos la hilera 0 (cadenas de base) para que no se oscurezca con el tejido
+        let yPos = canvasVivo.height - ((index + 1) * altoPorHilera);
+
+        // A. Hileras ya completadas por completo (por debajo de la actual)
         if (index < hileraActualIndex && hileraData.fila !== 0 && hileraData.fila !== '0') {
-            // Calculamos la posición Y exacta de abajo hacia arriba
-            let yPos = canvasVivo.height - ((index + 1) * altoPorHilera);
-            
-            // Pintamos la capa semitransparente para "apagar" esa hilera de color terminada
             ctxVivo.fillStyle = "rgba(0, 0, 0, 0.70)";
             ctxVivo.fillRect(0, yPos, canvasVivo.width, altoPorHilera);
         }
+        
+        // B. Hilera ACTUAL: oscurecemos los bloques ya hechos y enmarcamos el bloque actual
+        else if (index === hileraActualIndex && hileraData.fila !== 0 && hileraData.fila !== '0') {
+            let guardadoIndex = puntoParcialIndex[index] || 0;
+            
+            // Calculamos el total de puntos/ancho de esta hilera
+            let totalPuntos = hileraData.bloques.reduce((acc, b) => acc + b.cantidad, 0);
+            let anchoPorPunto = canvasVivo.width / totalPuntos;
+
+            let puntoAcumulado = 0;
+            hileraData.bloques.forEach((b, idxBloque) => {
+                let inicioX = puntoAcumulado * anchoPorPunto;
+                let anchoBloque = b.cantidad * anchoPorPunto;
+
+                if (idxBloque < guardadoIndex) {
+                    // Bloques ya avanzados en esta hilera: se oscurecen ligeramente
+                    ctxVivo.fillStyle = "rgba(0, 0, 0, 0.50)";
+                    ctxVivo.fillRect(inicioX, yPos, anchoBloque, altoPorHilera);
+                } else if (idxBloque === guardadoIndex) {
+                    // Bloque ACTUAL donde te quedaste: se destaca con un recuadro dorado
+                    ctxVivo.strokeStyle = "#d4a017";
+                    ctxVivo.lineWidth = 3;
+                    ctxVivo.strokeRect(inicioX, yPos, anchoBloque, altoPorHilera);
+                }
+                puntoAcumulado += b.cantidad;
+            });
+        }
     });
 }
+
 
 function ajustarZoomModal(delta) {
     modalZoomScale += delta;
