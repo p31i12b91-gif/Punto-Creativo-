@@ -1643,7 +1643,8 @@ function leerHileraVozActual() {
         }
 
 // 5. Modal de Tejer en Vivo con el botón de voz integrado
-let modalZoomScale = 1;
+
+            let modalZoomScale = 1;
 let puntoParcialIndex = {}; // Guarda por hilera en qué bloque/punto se quedó
 
 function abrirTejerEnVivo() {
@@ -1663,12 +1664,6 @@ function crearModalTejerEnVivo() {
         modalExistente.remove();
     }
 
-    const canvasPrincipal = document.getElementById('canvasPatron');
-    let imagenSrc = "";
-    if (canvasPrincipal) {
-        imagenSrc = canvasPrincipal.toDataURL();
-    }
-
     const modal = document.createElement('div');
     modal.id = 'modalTejerEnVivo';
     modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 3000; padding: 10px; overflow-y: auto;";
@@ -1682,11 +1677,10 @@ function crearModalTejerEnVivo() {
                 <button onclick="document.getElementById('modalTejerEnVivo').remove()" style="background: none; border: none; color: white; font-size: 1.3rem; cursor: pointer;">✕</button>
             </div>
             
-            <!-- 🔍 Imagen Más Grande con Zoom Ultra Nítido (Sin Blur) -->
-            ${imagenSrc ? `
+            <!-- 🔍 Imagen Dinámica que "apaga" hileras anteriores -->
             <div style="margin-bottom: 10px; background: #1a120b; padding: 8px; border-radius: 8px; border: 1px solid var(--color-tierra);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <span style="font-size: 0.75rem; color: var(--color-arena);">Diseño de Referencia:</span>
+                    <span style="font-size: 0.75rem; color: var(--color-arena);">Progreso en el Patrón:</span>
                     <div style="display: flex; gap: 5px;">
                         <button onclick="ajustarZoomModal(0.4)" style="background: #3a2e28; color: white; border: 1px solid var(--color-tierra); border-radius: 4px; padding: 2px 6px; font-size: 0.75rem; cursor: pointer;">🔍 + Zoom</button>
                         <button onclick="ajustarZoomModal(-0.4)" style="background: #3a2e28; color: white; border: 1px solid var(--color-tierra); border-radius: 4px; padding: 2px 6px; font-size: 0.75rem; cursor: pointer;">🔍 - Zoom</button>
@@ -1694,11 +1688,11 @@ function crearModalTejerEnVivo() {
                     </div>
                 </div>
                 <div style="width: 100%; height: 180px; overflow: auto; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 4px; border: 1px solid #444; position: relative;">
-                    <img id="imgTejerVivo" src="${imagenSrc}" style="max-height: 150px; object-fit: contain; image-rendering: pixelated; image-rendering: crisp-edges; -ms-interpolation-mode: nearest-neighbor; transition: transform 0.1s ease; transform: scale(1); transform-origin: center;">
+                    <canvas id="canvasTejerVivo" style="max-height: 150px; object-fit: contain; image-rendering: pixelated; image-rendering: crisp-edges; -ms-interpolation-mode: nearest-neighbor; transition: transform 0.1s ease; transform: scale(1); transform-origin: center;"></canvas>
                 </div>
-            </div>` : ''}
+            </div>
 
-            <!-- Contenedor de la Hilera Activa (con indicador de pausa) -->
+            <!-- Contenedor de la Hilera Activa -->
             <div id="vivoContenedorHilera" style="background: #221a15; padding: 12px; border-radius: 8px; border: 1px solid var(--color-tierra); margin-bottom: 10px; min-height: 90px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
             </div>
 
@@ -1715,23 +1709,63 @@ function crearModalTejerEnVivo() {
         </div>
     `;
     document.body.appendChild(modal);
+    actualizarCanvasTejerVivo();
+}
+
+function actualizarCanvasTejerVivo() {
+    const canvasPrincipal = document.getElementById('canvasPatron');
+    const canvasVivo = document.getElementById('canvasTejerVivo');
+    if (!canvasPrincipal || !canvasVivo) return;
+
+    const ctxPrincipal = canvasPrincipal.getContext('2d');
+    const ctxVivo = canvasVivo.getContext('2d');
+
+    // Copiamos las dimensiones exactas del canvas original
+    canvasVivo.width = canvasPrincipal.width;
+    canvasVivo.height = canvasPrincipal.height;
+
+    // Dibujamos la imagen original completa
+    ctxVivo.clearRect(0, 0, canvasVivo.width, canvasVivo.height);
+    ctxVivo.drawImage(canvasPrincipal, 0, 0);
+
+    // Si estamos tejiendo, oscurecemos o desaturamos las hileras ya pasadas
+    // En gráficos de tejido estilo matriz, la hilera 0 suele estar abajo o arriba según cómo se lea.
+    // Vamos a calcular la coordenada Y de los píxeles según la altura total y la cantidad de hileras.
+    const totalHileras = totalHilerasDatos.length;
+    const altoPorHilera = canvasVivo.height / totalHileras;
+
+    // Las hileras que ya pasaron (índices menores a hileraActualIndex) se apagan visualmente
+    // Dependiendo de si tu patrón se lee de abajo hacia arriba o de arriba hacia abajo:
+    // Por lo general, hileraActualIndex 0 es la primera. Vamos a apagar las anteriores.
+    
+    ctxVivo.fillStyle = "rgba(0, 0, 0, 0.75);"; // Capa semi-oscura para apagar
+    
+    for (let i = 0; i < totalHileras; i++) {
+        if (i < hileraActualIndex) {
+            // Dependiendo del sentido de tu matriz, ajustamos la posición Y
+            // Asumiendo orden visual de arriba hacia abajo (o invertido si tu canvas dibuja al revés)
+            let yPos = (totalHileras - 1 - i) * altoPorHilera; // Si empieza de abajo hacia arriba
+            // Si prefieres de arriba hacia abajo, usa: let yPos = i * altoPorHilera;
+            ctxVivo.fillRect(0, yPos, canvasVivo.width, altoPorHilera);
+        }
+    }
 }
 
 function ajustarZoomModal(delta) {
     modalZoomScale += delta;
     if (modalZoomScale < 1) modalZoomScale = 1;
     if (modalZoomScale > 6) modalZoomScale = 6;
-    const img = document.getElementById('imgTejerVivo');
-    if (img) {
-        img.style.transform = `scale(${modalZoomScale})`;
+    const canvas = document.getElementById('canvasTejerVivo');
+    if (canvas) {
+        canvas.style.transform = `scale(${modalZoomScale})`;
     }
 }
 
 function resetZoomModal() {
     modalZoomScale = 1;
-    const img = document.getElementById('imgTejerVivo');
-    if (img) {
-        img.style.transform = `scale(1)`;
+    const canvas = document.getElementById('canvasTejerVivo');
+    if (canvas) {
+        canvas.style.transform = `scale(1)`;
     }
 }
 
@@ -1762,6 +1796,9 @@ function actualizarVistaTejerEnVivo() {
     });
     htmlBloques += `</div>`;
     contenedorVivo.innerHTML = htmlBloques;
+
+    // Actualizamos también el canvas para que se apaguen las hileras correspondientes
+    actualizarCanvasTejerVivo();
 }
 
 function marcarPuntoParcial(hileraIdx, bloqueIdx) {
@@ -1795,6 +1832,7 @@ function marcarYAvanzarVivo() {
         alert('¡Felicitaciones! Llegaste a la última hilera del patrón.');
     }
 }
+        
         function cargarProyectosGuardados() {
             const contenedor = document.getElementById('listaProyectosGuardados');
             let proyectos = JSON.parse(localStorage.getItem('punto_creativo_proyectos') || '[]');
