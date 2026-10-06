@@ -813,8 +813,10 @@
     if (typeof verificarEstadoPro === 'function') verificarEstadoPro();
     alert(`¡Felicitaciones! Versión Pro activada por ${meses} mes(es) (${meses * 30} días) con éxito.`);
     
-    if (typeof renderizarLista
-
+    if (typeof renderizarListaCodigosAdmin === 'function') {
+        renderizarListaCodigosAdmin();
+    }
+}
 
         function intentarAbrirAdmin() {
             contadorClicksHeader++;
