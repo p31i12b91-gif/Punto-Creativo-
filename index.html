@@ -775,29 +775,31 @@
     let inputElem = document.getElementById('inputCodigoPro');
     if (!inputElem) return;
     
-    let codigoIngresado = inputElem.value.trim().toLowerCase();
-    let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
+    let codigoIngresado = inputElem.value.trim();
     
-    // Comparamos convirtiendo ambos a minúsculas para evitar problemas de mayúsculas/minúsculas
-    let index = listaCodigos.findIndex(c => c.codigo && c.codigo.toLowerCase() === codigoIngresado && !c.utilizado);
+    // Valida automáticamente el formato inteligente: Creativo - [meses] - [10 caracteres alfanuméricos]
+    let regexValidador = /^creativo-(\d+)-[a-zA-Z0-9]{10}$/i;
+    let coincidencia = codigoIngresado.match(regexValidador);
 
-    if (index !== -1) {
-        let item = listaCodigos[index];
-        let duracionMs = item.meses * 30 * 24 * 60 * 60 * 1000;
+    if (coincidencia) {
+        // Extrae los meses automáticamente del código ingresado
+        let meses = parseInt(coincidencia[1]);
+        
+        // Calcula los días exactos (30 días por cada mes en milisegundos)
+        let duracionMs = meses * 30 * 24 * 60 * 60 * 1000;
         let expiraTiempo = new Date().getTime() + duracionMs;
         
+        // Activa la versión Pro en el dispositivo del cliente
         localStorage.setItem('punto_creativo_pro', JSON.stringify({ expira: expiraTiempo }));
-        item.utilizado = true;
-        item.fechaUso = new Date().toLocaleDateString();
-        localStorage.setItem('punto_creativo_codigos_pro_db', JSON.stringify(listaCodigos));
 
         inputElem.value = '';
         if (typeof verificarEstadoPro === 'function') verificarEstadoPro();
-        alert(`¡Felicitaciones! Versión Pro activada por ${item.meses} mes(es) con éxito.`);
+        alert(`¡Felicitaciones! Versión Pro activada por ${meses} mes(es) con éxito.`);
     } else {
-        alert('Código inválido o ya utilizado.');
+        alert('Código inválido o mal ingresado.');
     }
 }
+
 
 
         function intentarAbrirAdmin() {
@@ -843,7 +845,7 @@
             alert('Sesión de administrador cerrada.');
         }
 
-                function generarNuevoCodigoPro() {
+                        function generarNuevoCodigoPro() {
             let meses = parseInt(document.getElementById('adminMesesUser').value) || 1;
 
             // Caracteres permitidos: letras y números del 0 al 9
@@ -855,8 +857,8 @@
                 aleatorio += chars.charAt(Math.floor(Math.random() * chars.length));
             }
 
-            // Estructura limpia y simplificada: Creativo - 10 dígitos alfanuméricos
-            let codigoGenerado = `Creativo-${aleatorio}`;
+            // Estructura inteligente con los meses incluidos: Creativo - [Meses] - [10 dígitos alfanuméricos]
+            let codigoGenerado = `Creativo-${meses}-${aleatorio}`;
             
             let listaCodigos = JSON.parse(localStorage.getItem('punto_creativo_codigos_pro_db') || '[]');
             
